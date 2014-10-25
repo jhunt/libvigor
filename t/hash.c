@@ -1,0 +1,143 @@
+/*
+  Copyright 2014 James Hunt <james@jameshunt.us>
+
+  This file is part of libvigor.
+
+  libvigor is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  libvigor is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with libvigor.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "test.h"
+
+TESTS {
+	subtest {
+		hash_t *h;
+		char *path = strdup("/some/path/some/where");
+		char *name = strdup("staff");
+
+		isnt_null(h = vmalloc(sizeof(hash_t)), "hash_new -> pointer");
+
+		is_null(hash_get(h, "path"), "can't get 'path' prior to set");
+		is_null(hash_get(h, "name"), "can't get 'name' prior to set");
+
+		ok(hash_set(h, "path", path) == path, "set h.path");
+		ok(hash_set(h, "name", name) == name, "set h.name");
+
+		is_string(hash_get(h, "path"), path, "get h.path");
+		is_string(hash_get(h, "name"), name, "get h.name");
+
+		hash_done(h, 0);
+		free(h);
+		free(path);
+		free(name);
+	}
+
+	subtest {
+		hash_t *h;
+		char *path  = strdup("/some/path/some/where");
+		char *group = strdup("staff");
+
+		isnt_null(h = vmalloc(sizeof(hash_t)), "hash_new -> pointer");
+
+		is_null(hash_get(h, "path"),  "get h.path (initially null)");
+		is_null(hash_get(h, "group"), "get h.group (initially null)");
+
+		ok(hash_set(h, "path",  path)  == path,  "set h.path");
+		ok(hash_set(h, "group", group) == group, "set h.group");
+
+		is_string(hash_get(h, "path"),  path,  "get h.path");
+		is_string(hash_get(h, "group"), group, "get h.group");
+
+		hash_done(h, 0);
+		free(h);
+		free(path);
+		free(group);
+	}
+
+	subtest {
+		hash_t *h;
+		char *value1 = strdup("value1");
+		char *value2 = strdup("value2");
+
+		isnt_null(h = vmalloc(sizeof(hash_t)), "hash_new -> pointer");
+
+		ok(hash_set(h, "key", value1) == value1, "first hash_set for overrides");
+		is_string(hash_get(h, "key"), value1, "hash_get of first value");
+
+		// hash_set returns previous value on override
+		ok(hash_set(h, "key", value2) == value1, "second hash_set for overrides");
+		is_string(hash_get(h, "key"), value2, "hash_get of second value");
+
+		hash_done(h, 1);
+		free(h);
+		free(value1);
+	}
+
+	subtest {
+		hash_t *h = NULL;
+
+		is_null(hash_get(NULL, "test"), "hash_get NULL hash");
+
+		isnt_null(h = vmalloc(sizeof(hash_t)), "hash_new -> pointer");
+		hash_set(h, "test", "valid");
+
+		is_null(hash_get(h, NULL), "hash_get NULL key");
+		hash_done(h, 0);
+		free(h);
+	}
+
+	subtest {
+		hash_t *h = vmalloc(sizeof(hash_t));
+		char *key, *value;
+
+		int saw_promise = 0;
+		int saw_snooze  = 0;
+		int saw_central = 0;
+		int saw_bridge  = 0;
+
+		hash_set(h, "promise", "esimorp");
+		hash_set(h, "snooze",  "ezoons");
+		hash_set(h, "central", "lartnec");
+		hash_set(h, "bridge",  "egdirb");
+
+		for_each_key_value(h, key, value) {
+			if (strcmp(key, "promise") == 0) {
+				saw_promise++;
+				is_string(value, "esimorp", "h.promise");
+
+			} else if (strcmp(key, "snooze") == 0) {
+				saw_snooze++;
+				is_string(value, "ezoons", "h.snooze");
+
+			} else if (strcmp(key, "central") == 0) {
+				saw_central++;
+				is_string(value, "lartnec", "h.central");
+
+			} else if (strcmp(key, "bridge") == 0) {
+				saw_bridge++;
+				is_string(value, "egdirb", "h.bridge");
+
+			} else {
+				fail("Unexpected value found during for_each_key_value");
+			}
+		}
+		hash_done(h, 0);
+
+		is_int(saw_promise, 1, "saw the promise key only once");
+		is_int(saw_snooze,  1, "saw the snooze key only once");
+		is_int(saw_central, 1, "saw the central key only once");
+		is_int(saw_bridge,  1, "saw the bridge key only once");
+	}
+
+	done_testing();
+}
