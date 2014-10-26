@@ -17,6 +17,7 @@ core_src += src/impl.h
 core_src += src/basex.c
 core_src += src/cache.c
 core_src += src/config.c
+core_src += src/cert.c
 core_src += src/fqdn.c
 core_src += src/hash.c
 core_src += src/list.c
@@ -46,6 +47,10 @@ CTAP_TESTS += t/cache
 t_cache_SOURCES = t/cache.c t/test.h
 t_cache_LDFLAGS = libvigor.la
 
+CTAP_TESTS += t/cert
+t_cert_SOURCES = t/cert.c t/test.h
+t_cert_LDFLAGS = libvigor.la
+
 CTAP_TESTS += t/hash
 t_hash_SOURCES = t/hash.c t/test.h
 t_hash_LDFLAGS = libvigor.la
@@ -68,6 +73,20 @@ check_PROGRAMS = $(CTAP_TESTS)
 
 EXTRA_DIST  = README COPYING
 EXTRA_DIST += bootstrap
+EXTRA_DIST += t/data
+
+test-data:
+	rm -f t/tmp/check-data-install.stamp
+	make t/tmp/check-data-install.stamp
+clean-local-check:
+	rm -fr t/tmp/*
+	rm -f check-data-install.stamp
+check_DATA = t/tmp/check-data-install.stamp
+t/tmp/check-data-install.stamp:
+	mkdir -p t/tmp
+	cp -a $(srcdir)/t/data t/tmp
+	find t/tmp -type d ! -perm -200 -exec chmod u+w {} ';'
+	touch $@
 
 ############################################################
 

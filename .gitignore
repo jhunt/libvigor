@@ -24,7 +24,10 @@ config.h
 
 t/basex
 t/cache
+t/cert
 t/hash
 t/list
 t/path
 t/strings
+
+t/tmp

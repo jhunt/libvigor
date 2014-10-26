@@ -23,5 +23,14 @@
 #include <ctap.h>
 #include <errno.h>
 #include <vigor.h>
+#include <assert.h>
+
+#ifndef TEST_DATA
+#define TEST_DATA "t/data"
+#endif
+
+#ifndef TEST_TMP
+#define TEST_TMP  "t/tmp"
+#endif
 
 #endif

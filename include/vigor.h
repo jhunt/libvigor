@@ -446,4 +446,72 @@ int signalled(void);
 
 void seed_randomness(void);
 
+/*
+
+     ######  ######## ########  ########
+    ##    ## ##       ##     ##    ##
+    ##       ##       ##     ##    ##
+    ##       ######   ########     ##
+    ##       ##       ##   ##      ##
+    ##    ## ##       ##    ##     ##
+     ######  ######## ##     ##    ##
+
+ */
+
+#define CW_CERT_TYPE_ENCRYPTION 0
+#define CW_CERT_TYPE_SIGNING    1
+
+typedef struct {
+	char   *ident;
+	int     type;
+
+	int     pubkey;
+	uint8_t pubkey_bin[32];
+	uint8_t seckey_bin[64];
+
+	int     seckey;
+	char    pubkey_b16[65];
+	char    seckey_b16[129];
+} cert_t;
+
+typedef struct {
+	int     verify;
+	list_t  certs;
+} trustdb_t;
+
+cert_t* cert_new(int type);
+cert_t* cert_make(int type, const char *pub, const char *sec);
+cert_t* cert_generate(int type);
+cert_t* cert_read(const char *path);
+cert_t* cert_readio(FILE *io);
+
+int cert_write(cert_t *key, const char *path, int full);
+int cert_writeio(cert_t *key, FILE *io, int full);
+
+void cert_destroy(cert_t *key);
+
+uint8_t *cert_public(cert_t *key);
+uint8_t *cert_secret(cert_t *key);
+char *cert_public_s(cert_t *key);
+char *cert_secret_s(cert_t *key);
+int cert_rescan(cert_t *key);
+int cert_encode(cert_t *key);
+
+unsigned long long cert_seal(cert_t *k, const void *u, unsigned long long ulen, uint8_t **s);
+unsigned long long cert_unseal(cert_t *k, const void *s, unsigned long long slen, uint8_t **u);
+int cert_sealed(cert_t *k, const void *s, unsigned long long slen);
+
+trustdb_t* trustdb_new(void);
+trustdb_t* trustdb_read(const char *path);
+trustdb_t* trustdb_readio(FILE *io);
+
+int trustdb_write(trustdb_t *ca, const char *path);
+int trustdb_writeio(trustdb_t *ca, FILE *io);
+
+void trustdb_destroy(trustdb_t *ca);
+
+int trustdb_trust(trustdb_t *ca, cert_t *key);
+int trustdb_revoke(trustdb_t *ca, cert_t *key);
+int trustdb_verify(trustdb_t *ca, cert_t *key, const char *ident);
+
 #endif

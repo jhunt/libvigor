@@ -40,4 +40,6 @@
 #include <netdb.h>
 #include <pwd.h>
 
+#include <sodium.h>
+
 #endif

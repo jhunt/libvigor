@@ -18,6 +18,10 @@ AC_HAVE_LIBRARY(ctap,,
 AC_HAVE_LIBRARY(zmq,,
 	AC_MSG_ERROR(Missing 0MQ library))
 
+AC_CHECK_LIB(sodium,
+	crypto_box_keypair,,
+	AC_MSG_ERROR(Missing sodium encryption library))
+
 AC_C_INLINE
 
 AC_CONFIG_HEADER([config.h])
