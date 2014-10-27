@@ -203,7 +203,7 @@ typedef struct {
 typedef struct {
 	size_t  len;
 	size_t  max_len;
-	int32_t min_life;
+	int32_t expire;
 
 	void (*destroy_f)(void*);
 
@@ -215,14 +215,14 @@ typedef struct {
 	for ((cc)->index.offset = (cc)->index.bucket = 0; \
 	     hash_next(&(cc)->index, &(k), NULL); )
 
-#define VIGOR_CACHE_DESTROY  1
-#define VIGOR_CACHE_MINLIFE  2
+#define VIGOR_CACHE_DESTRUCTOR 1
+#define VIGOR_CACHE_EXPIRY     2
 
-cache_t* cache_new(size_t max, int32_t min_life);
-int cache_tune(cache_t **cc, size_t max, int32_t min_life);
+cache_t* cache_new(size_t max, int32_t expire);
 void cache_free(cache_t *cc);
 void cache_purge(cache_t *cc, int force);
-int   cache_opt(cache_t *cc, int op, void *value);
+int cache_resize(cache_t **cc, size_t max);
+int   cache_setopt(cache_t *cc, int op, void *value);
 void* cache_get(cache_t *cc, const char *id);
 void* cache_set(cache_t *cc, const char *id, void *data);
 void* cache_unset(cache_t *cc, const char *id);

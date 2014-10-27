@@ -29,8 +29,8 @@ TESTS {
 	subtest { /* basic types */
 		cache_t *cc = cache_new(4, 20);
 		isnt_null(cc, "cache_new created a new cache");
-		is_int(cc->max_len,   4, "Set cc->max_len properly");
-		is_int(cc->min_life, 20, "Set cc->min_life properly");
+		is_int(cc->max_len,  4, "Set cc->max_len properly");
+		is_int(cc->expire,  20, "Set cc->expire properly");
 
 		cache_purge(cc, 0);
 		ok(1, "cache_purge() on an empty cache doesn't crash");
@@ -59,9 +59,9 @@ TESTS {
 		isnt_null(cache_get(cc, "xyzzy"),
 			"'xyzzy' survives the first cache purge");
 		int life = -2;
-		is_int(cache_opt(cc, VIGOR_CACHE_MINLIFE, &life), 0,
-			"Set new minimum lifetime via cache_opt");
-		is_int(cc->min_life, -2, "cc->min_life updated");
+		is_int(cache_setopt(cc, VIGOR_CACHE_EXPIRY, &life), 0,
+			"Set new minimum lifetime via cache_setopt");
+		is_int(cc->expire, -2, "cc->expire updated");
 		cache_purge(cc, 0);
 		is_null(cache_get(cc, "xyzzy"),
 			"'xyzzy' purged in the second cache purge");
@@ -72,7 +72,7 @@ TESTS {
 	subtest { /* destroy callback */
 		cache_t *cc = cache_new(4, -1);
 		isnt_null(cc, "cache_new created a new cache");
-		is_int(cache_opt(cc, VIGOR_CACHE_DESTROY, destroyer), 0,
+		is_int(cache_setopt(cc, VIGOR_CACHE_DESTRUCTOR, destroyer), 0,
 			"Set destroyer() as the destroy callback");
 
 		isnt_null(cache_set(cc, "key1", (void*)1), "key1 inserted");
@@ -107,25 +107,16 @@ TESTS {
 		cache_free(cc);
 	}
 
-	subtest { /* tuning caches */
+	subtest { /* resizing caches */
 		cache_t *cc = cache_new(4, 20);
+		is_int(cc->max_len,  4, "max_len is initially 4");
+		is_int(cc->expire,  20, "expire is initially 20s");
 
-		is_int(cc->max_len,   4, "max_len is initially 4");
-		is_int(cc->min_life, 20, "min_life is initially 20s");
+		ok(cache_resize(&cc, 10) == 0, "resized cache from 4 to 10 entries");
+		is_int(cc->max_len, 10, "max_len is now 10");
+		is_int(cc->expire,  20, "expire is still 20s");
 
-		ok(cache_tune(&cc, 0, 0) == 0, "cache_tune(cc, 0, 0) is ok");
-		is_int(cc->max_len,   4, "max_len is still 4");
-		is_int(cc->min_life, 20, "min_life is still 20s");
-
-		ok(cache_tune(&cc, 0, 60) == 0, "changed cache life to 60s");
-		is_int(cc->max_len,   4, "max_len is still 4");
-		is_int(cc->min_life, 60, "min_life is 60s");
-
-		ok(cache_tune(&cc, 10, 15) == 0, "changed cache life to 15s / 10 entries");
-		is_int(cc->max_len,  10, "max_len is now 10");
-		is_int(cc->min_life, 15, "min_life is 15s now");
-
-		ok(cache_tune(&cc,  1, 0) != 0, "can't tune a cache to a lower max_len");
+		ok(cache_resize(&cc, 1) != 0, "can't reduce cache size");
 
 		cache_free(cc);
 	}
@@ -140,7 +131,7 @@ TESTS {
 
 		is_null(cache_set(cc, "key5", (void*)5), "key5 is too much");
 
-		ok(cache_tune(&cc, 128, 0) == 0, "extended cache from 4 slots to 128 slots");
+		ok(cache_resize(&cc, 128) == 0, "extended cache from 4 slots to 128 slots");
 		isnt_null(cache_set(cc, "key5", (void*)5), "key5 inserted (post-tune)");
 
 		cache_free(cc);
