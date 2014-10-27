@@ -79,6 +79,27 @@ static uint8_t BASE16_DECODE[256] = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 370 - 377 */
 };
 
+/**
+  Encode data into hexadecimal (base-16) notation.
+
+  A source buffer $src of $slen bytes will be expanded into its ASCII-safe,
+  hexadecimal (base-16) representation into destination buffer $dst, which
+  must be pre-allocated by the caller.
+
+  With base-16 encoding, each input byte (8 bits) is converted into two
+  output bytes, each representing 4 bits as a hexadecimal digit from zero
+  (0) to fifteen (f).  As such, the $dst buffer must be at least twice the
+  size of the $src buffer.
+
+  On success, returns the number of hex digits written to $dst (which should
+  be exactly 2 * $slen).
+
+  On failure, -1 is returned and errno is set appropriately:
+
+    - **EINVAL** - The $dst buffer is too small to house the encoded data.
+
+  This implementation always uses lower case a-f hexadecimal digits.
+ */
 int base16_encode(char *dst, size_t dlen, const void *src, size_t slen)
 {
 	/* empty string encodes as itself (no bytes) */
@@ -100,6 +121,30 @@ int base16_encode(char *dst, size_t dlen, const void *src, size_t slen)
 	return d - dst;
 }
 
+/**
+  Decode hexadecimal (base-16) notation into raw binary form
+
+  A source buffer $src of $slen byuutes will be interpreted as a string
+  of hexadecimal digits (0-9 and a-f or A-F) and converted back into its
+  normal binary form in the destination buffer $dst.  The $dst buffer
+  must be pre-allocated by the caller.
+
+  With base-16 encoding, each pair of hexadecimal digits represents 8 bits
+  of raw data.  Therefore, the $dst buffer must be at least half the size
+  of the $src buffer.
+
+  On success, returns the number of bytes written to $dst (which should be
+  exactly $slen / 2).
+
+  On failure, -1 is returned and errno is set appropriately:
+
+    - **`EINVAL`** - The $dst buffer is too small to house the decoded data.
+    - **`EILSEQ`** - An illegal character was found in the input $src.
+
+  While base16_encode() will only ever produce lowercase hex digits, this
+  implementation understands both lower- and uppsercase.
+
+ */
 int base16_decode(void *dst, size_t dlen, const char *src, size_t slen)
 {
 	/* empty string decodes as itself (no bytes) */
@@ -127,6 +172,20 @@ int base16_decode(void *dst, size_t dlen, const char *src, size_t slen)
 	return d - dst;
 }
 
+/**
+  Encode data into a NULL-terminated hex string.
+
+  A convenience wrapper around base16_encode(), this function will return
+  a NULL-terminated string containing the hexadecimal (base-16) representation
+  of the input buffer $src, which should be $len bytes long.
+
+  On success, returns a pointer to the newly-allocated string.  The caller is
+  responsible from memory management from then on.
+
+  On failure, returns NULL and sets errno appropriately:
+
+    - **`EINVAL`** - $len is too small (0 or below).
+ */
 char* base16_encodestr(const void *src, size_t len)
 {
 	assert(src);
@@ -146,6 +205,27 @@ char* base16_encodestr(const void *src, size_t len)
 	return dst;
 }
 
+/**
+  Decode a hexadecimal notation into a NULL-terminated string.
+
+  A convenience wrapper around base16_decode(), this function will return
+  a NULL-terminated string containing the decoded binary data that the $src
+  buffer represents.
+
+  On success, returns a pointer to the newly-allocated string.  The caller is
+  responsible for memory management from then on.
+
+  On failure, returns NULL and sets errno appropriately:
+
+    - **`EINVAL`** - $len is too small (0 or below).
+    - **`EILSEQ`** - An illegal character was found in the input $src.
+
+  **Note:** because the returned NULL-terminated string is the _raw data_,
+  you must be careful when using this on hex strings that represent binary
+  data that may have literal '\0' bytes in them.  This function will happily
+  decode them into premature NULL-terminators, leaving you with short data
+  strings.
+ */
 char* base16_decodestr(const char *src, size_t len)
 {
 	assert(src);
