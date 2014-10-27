@@ -173,13 +173,13 @@ struct keyval {
 	list_t l;
 };
 
+#define CONFIG(n) config_t n = { &(n), &(n) }
 int config_set  (config_t *cfg, const char *key, const char *val);
 int config_unset(config_t *cfg, const char *key);
 char* config_get(config_t *cfg, const char *key);
 int config_isset(config_t *cfg, const char *key);
 int config_read (config_t *cfg, FILE *io);
 int config_write(config_t *cfg, FILE *io);
-int config_uniq (config_t *dest, config_t *src);
 int config_done (config_t *cfg);
 
 /*

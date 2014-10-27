@@ -121,29 +121,17 @@ int config_read(config_t *cfg, FILE *io)
 
 int config_write(config_t *cfg, FILE *io)
 {
-	int rc;
-
-	config_t uniq;
-	rc = list_init(&uniq);
-	assert(rc == 0);
-
-	rc = config_uniq(&uniq, cfg);
-	assert(rc == 0);
+	CONFIG(uniq);
 
 	keyval_t *kv;
-	for_each_object(kv, &uniq, l)
-		fprintf(io, "%s %s\n", kv->key, kv->val);
-
-	return 0;
-}
-
-int config_uniq(config_t *dest, config_t *src)
-{
-	keyval_t *kv, *tmp;
-	for_each_object_safe(kv, tmp, src, l) {
-		if (config_isset(dest, kv->key)) continue;
-		config_set(dest, kv->key, kv->val);
+	for_each_object(kv, cfg, l) {
+		if (!config_isset(&uniq, kv->key)) {
+			config_set(&uniq, kv->key, kv->val);
+			fprintf(io, "%s %s\n", kv->key, kv->val);
+		}
 	}
+
+	config_done(&uniq);
 	return 0;
 }
 

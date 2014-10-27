@@ -53,6 +53,10 @@ CTAP_TESTS += t/cert
 t_cert_SOURCES = t/cert.c t/test.h
 t_cert_LDFLAGS = libvigor.la
 
+CTAP_TESTS += t/config
+t_config_SOURCES = t/config.c t/test.h
+t_config_LDFLAGS = libvigor.la
+
 CTAP_TESTS += t/hash
 t_hash_SOURCES = t/hash.c t/test.h
 t_hash_LDFLAGS = libvigor.la

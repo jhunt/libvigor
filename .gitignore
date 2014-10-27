@@ -28,6 +28,7 @@ config.h
 *.gcno
 
 t/basex
+t/config
 t/cache
 t/cert
 t/hash
