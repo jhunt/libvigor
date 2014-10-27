@@ -39,6 +39,7 @@ t/mem
 t/mq
 t/path
 t/proc
+t/signals
 t/strings
 t/time
 

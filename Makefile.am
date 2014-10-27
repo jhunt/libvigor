@@ -89,6 +89,10 @@ CTAP_TESTS += t/proc
 t_proc_SOURCES = t/proc.c t/test.h
 t_proc_LDFLAGS = libvigor.la
 
+CTAP_TESTS += t/signals
+t_signals_SOURCES = t/signals.c t/test.h
+t_signals_LDFLAGS = libvigor.la
+
 CTAP_TESTS += t/strings
 t_strings_SOURCES = t/strings.c t/test.h
 t_strings_LDFLAGS = libvigor.la

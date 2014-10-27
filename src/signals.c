@@ -48,5 +48,7 @@ void signal_handlers(void)
 
 int signalled(void)
 {
-	return VIGOR_SIGNALLED > 0;
+	int rc = VIGOR_SIGNALLED > 0;
+	VIGOR_SIGNALLED = 0;
+	return rc;
 }
