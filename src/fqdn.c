@@ -30,6 +30,20 @@
 	##        ##### ## ########  ##    ##
  */
 
+/**
+  Determine fully-qualified domain name of the local host.
+
+  Using DNS and/or the /etc/hosts file, fqdn() determines the
+  fully-qualified domain name of the local host.  This includes
+  the node name (server name) as well as the full dotted domain
+  name where this host resides.
+
+  For example, on a box named 'igor' on the 'lab.example.com'
+  domain, the FQDN will be 'igor.lab.example.com'.
+
+  Returns a newly-allocated, NULL-terminated string containing
+  the FQDN on success, and NULL on failure.
+ */
 char* fqdn(void)
 {
 	char nodename[1024];
