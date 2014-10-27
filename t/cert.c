@@ -23,9 +23,13 @@
 #define EMPTY_B16_KEY "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
 TESTS {
+	subtest { /* failure on instantiation */
+		is_null(cert_new(42), "Fail to create a non-ENCRPYTION, non-SIGNING cert");
+	}
+
 	subtest { /* basic key generation */
-		cert_t *key = cert_new(CW_CERT_TYPE_ENCRYPTION);
-		ok(key->type == CW_CERT_TYPE_ENCRYPTION, "newly-created key is an encryption key");
+		cert_t *key = cert_new(VIGOR_CERT_ENCRYPTION);
+		ok(key->type == VIGOR_CERT_ENCRYPTION, "newly-created key is an encryption key");
 		ok(!key->pubkey, "newly-created key has no public key");
 		ok(!key->seckey, "newly-created key has no secret key");
 		ok(memcmp(key->pubkey_b16, EMPTY_B16_KEY, 64) == 0,
@@ -38,10 +42,10 @@ TESTS {
 			"secret key (binary) is all zeros on creation");
 
 		cert_destroy(key);
-		key = cert_generate(CW_CERT_TYPE_ENCRYPTION);
+		key = cert_generate(VIGOR_CERT_ENCRYPTION);
 		isnt_null(key, "cert_generate() returned a pointer");
 
-		ok(key->type == CW_CERT_TYPE_ENCRYPTION, "newly-generated key is an encryption key");
+		ok(key->type == VIGOR_CERT_ENCRYPTION, "newly-generated key is an encryption key");
 		ok(key->pubkey, "newly-generated key has a public key");
 		ok(key->seckey, "newly-generated key has a secret key");
 		ok(memcmp(key->pubkey_b16, EMPTY_B16_KEY, 64) != 0,
@@ -53,8 +57,8 @@ TESTS {
 		ok(memcmp(key->seckey_bin, EMPTY_BIN_KEY, 32) != 0,
 			"secret key (binary) is not all zeros");
 
-		cert_t *other = cert_generate(CW_CERT_TYPE_ENCRYPTION);
-		ok(key->type == CW_CERT_TYPE_ENCRYPTION, "newly-generated key is an encryption key");
+		cert_t *other = cert_generate(VIGOR_CERT_ENCRYPTION);
+		ok(key->type == VIGOR_CERT_ENCRYPTION, "newly-generated key is an encryption key");
 		ok(memcmp(key->pubkey_bin, other->pubkey_bin, 32) != 0,
 			"cert_generate() generates unique public keys");
 		ok(memcmp(key->seckey_bin, other->pubkey_bin, 32) != 0,
@@ -63,11 +67,11 @@ TESTS {
 		cert_destroy(key);
 		cert_destroy(other);
 
-		key = cert_make(CW_CERT_TYPE_SIGNING,
+		key = cert_make(VIGOR_CERT_SIGNING,
 				"0394ba6c5dda02a38ad80ff80560179e8c52a9cb178d18d86490d04149ab3546",
 				NULL);
 		isnt_null(key, "cert_make() returned a key");
-		ok(key->type == CW_CERT_TYPE_SIGNING, "cert_make() gave us a signing key");
+		ok(key->type == VIGOR_CERT_SIGNING, "cert_make() gave us a signing key");
 		ok(key->pubkey, "cert_make() set the public key");
 		ok(memcmp(key->pubkey_bin,
 			"\x03\x94\xba\x6c\x5d\xda\x02\xa3\x8a\xd8\x0f\xf8\x05\x60\x17\x9e"
@@ -79,12 +83,12 @@ TESTS {
 		ok(!key->seckey, "no secret key given (NULL arg)");
 
 		cert_destroy(key);
-		key = cert_make(CW_CERT_TYPE_SIGNING,
+		key = cert_make(VIGOR_CERT_SIGNING,
 			"0394ba6c5dda02a38ad80ff80560179e8c52a9cb178d18d86490d04149ab3546",
 			"feb546ed444dddb23c9a3c7a72236cf32c90148649d4563d8264665f248db516"
 			"feb546ed444dddb23c9a3c7a72236cf32c90148649d4563d8264665f248db516");
 		isnt_null(key, "cert_make() returned a key");
-		ok(key->type == CW_CERT_TYPE_SIGNING, "cert_make() gave us a signing key");
+		ok(key->type == VIGOR_CERT_SIGNING, "cert_make() gave us a signing key");
 		ok(key->pubkey, "cert_make() set the public key");
 		ok(memcmp(key->pubkey_bin,
 			"\x03\x94\xba\x6c\x5d\xda\x02\xa3\x8a\xd8\x0f\xf8\x05\x60\x17\x9e"
@@ -106,13 +110,13 @@ TESTS {
 			"cert_make() populated the secret key (base16) properly");
 		cert_destroy(key);
 
-		key = cert_make(CW_CERT_TYPE_SIGNING, NULL, NULL);
+		key = cert_make(VIGOR_CERT_SIGNING, NULL, NULL);
 		is_null(key, "cert_make() requires a pubkey");
-		key = cert_make(CW_CERT_TYPE_SIGNING, "pubkey", NULL);
+		key = cert_make(VIGOR_CERT_SIGNING, "pubkey", NULL);
 		is_null(key, "cert_make() requires pubkey to be 64 characters long");
-		key = cert_make(CW_CERT_TYPE_ENCRYPTION, EMPTY_B16_KEY, "test");
+		key = cert_make(VIGOR_CERT_ENCRYPTION, EMPTY_B16_KEY, "test");
 		is_null(key, "cert_make(ENC) requires seckey to be 64 characters long");
-		key = cert_make(CW_CERT_TYPE_SIGNING, EMPTY_B16_KEY, EMPTY_BIN_KEY);
+		key = cert_make(VIGOR_CERT_SIGNING, EMPTY_B16_KEY, EMPTY_BIN_KEY);
 		is_null(key, "cert_make(SIG) requires seckey to be 128 characters long");
 	}
 
@@ -127,7 +131,7 @@ TESTS {
 
 		key = cert_read(TEST_DATA "/certs/combined.crt");
 		isnt_null(key, "Read combined certificate from certs/combined.crt");
-		ok(key->type == CW_CERT_TYPE_ENCRYPTION, "combined.crt is an encryption key");
+		ok(key->type == VIGOR_CERT_ENCRYPTION, "combined.crt is an encryption key");
 		ok(key->pubkey, "combined.crt contains a public key");
 		ok(key->seckey, "combined.crt contains a secret key");
 
@@ -174,7 +178,7 @@ TESTS {
 	subtest { /* read in (pub) */
 		cert_t *key = cert_read(TEST_DATA "/certs/public.crt");
 		isnt_null(key, "Read public certificate from certs/public.crt");
-		ok(key->type == CW_CERT_TYPE_ENCRYPTION, "public.crt is an encryption key");
+		ok(key->type == VIGOR_CERT_ENCRYPTION, "public.crt is an encryption key");
 		ok( key->pubkey, "public.crt contains a public key");
 		ok(!key->seckey, "public.crt does not contain a secret key");
 
@@ -190,7 +194,7 @@ TESTS {
 	}
 
 	subtest { /* write out (full) */
-		cert_t *key = cert_generate(CW_CERT_TYPE_ENCRYPTION);
+		cert_t *key = cert_generate(VIGOR_CERT_ENCRYPTION);
 		key->ident = strdup("a.new.host.to.test");
 
 		isnt_int(cert_write(key, "/root/permdenied", 1), 0,
@@ -211,7 +215,7 @@ TESTS {
 	}
 
 	subtest { /* write out (!full) */
-		cert_t *key = cert_generate(CW_CERT_TYPE_ENCRYPTION);
+		cert_t *key = cert_generate(VIGOR_CERT_ENCRYPTION);
 		key->ident = strdup("a.new.host.to.test");
 
 		isnt_int(cert_write(key, "/root/permdenied", 1), 0,
@@ -232,7 +236,7 @@ TESTS {
 	}
 
 	subtest { /* change keys * rescan */
-		cert_t *key = cert_generate(CW_CERT_TYPE_ENCRYPTION);
+		cert_t *key = cert_generate(VIGOR_CERT_ENCRYPTION);
 		uint8_t oldpub[32], oldsec[32];
 
 		memcpy(oldpub, key->pubkey_bin, 32);
@@ -264,7 +268,7 @@ TESTS {
 		trustdb_t *ca = trustdb_new();
 		assert(ca);
 
-		cert_t *key = cert_generate(CW_CERT_TYPE_ENCRYPTION);
+		cert_t *key = cert_generate(VIGOR_CERT_ENCRYPTION);
 		assert(key);
 		const char *fqdn = "original.host.name";
 		const char *fail = "some.other.host.name";
@@ -309,7 +313,7 @@ TESTS {
 		trustdb_t *ca = trustdb_read(TEST_DATA "/certs/trusted");
 		isnt_null(ca, "read certificate authority from file");
 
-		cert_t *other = cert_generate(CW_CERT_TYPE_ENCRYPTION);
+		cert_t *other = cert_generate(VIGOR_CERT_ENCRYPTION);
 		isnt_null(other, "generated new (untrusted) key");
 
 		cert_t *key = cert_read(TEST_DATA "/certs/combined.crt");
@@ -327,7 +331,7 @@ TESTS {
 		trustdb_t *ca = trustdb_read(TEST_DATA "/certs/trusted");
 		isnt_null(ca, "read certificate authority from file");
 
-		cert_t *other = cert_generate(CW_CERT_TYPE_ENCRYPTION);
+		cert_t *other = cert_generate(VIGOR_CERT_ENCRYPTION);
 		isnt_null(other, "generated new (untrusted) key");
 		other->ident = strdup("xyz.host");
 
@@ -355,7 +359,7 @@ TESTS {
 	/************************************************************************/
 
 	subtest { /* basic key generation */
-		cert_t *key = cert_new(CW_CERT_TYPE_SIGNING);
+		cert_t *key = cert_new(VIGOR_CERT_SIGNING);
 		ok(!key->pubkey, "newly-created key has no public key");
 		ok(!key->seckey, "newly-created key has no secret key");
 		ok(memcmp(key->pubkey_b16, EMPTY_B16_KEY, 64) == 0,
@@ -368,7 +372,7 @@ TESTS {
 			"secret key (binary) is all zeros on creation");
 
 		cert_destroy(key);
-		key = cert_generate(CW_CERT_TYPE_SIGNING);
+		key = cert_generate(VIGOR_CERT_SIGNING);
 		isnt_null(key, "cert_generate() returned a pointer");
 
 		ok(key->pubkey, "newly-generated key has a public key");
@@ -382,7 +386,7 @@ TESTS {
 		ok(memcmp(key->seckey_bin, EMPTY_BIN_KEY EMPTY_BIN_KEY, 64) != 0,
 			"secret key (binary) is not all zeros");
 
-		cert_t *other = cert_generate(CW_CERT_TYPE_SIGNING);
+		cert_t *other = cert_generate(VIGOR_CERT_SIGNING);
 		ok(memcmp(key->pubkey_bin, other->pubkey_bin, 32) != 0,
 			"cert_generate() generates unique public keys");
 		ok(memcmp(key->seckey_bin, other->pubkey_bin, 32) != 0,
@@ -471,7 +475,7 @@ TESTS {
 	}
 
 	subtest { /* write out (full) */
-		cert_t *key = cert_generate(CW_CERT_TYPE_SIGNING);
+		cert_t *key = cert_generate(VIGOR_CERT_SIGNING);
 		key->ident = strdup("jhacker");
 
 		isnt_int(cert_write(key, "/root/permdenied", 1), 0,
@@ -492,7 +496,7 @@ TESTS {
 	}
 
 	subtest { /* write out (!full) */
-		cert_t *key = cert_generate(CW_CERT_TYPE_SIGNING);
+		cert_t *key = cert_generate(VIGOR_CERT_SIGNING);
 		key->ident = strdup("a.new.host.to.test");
 
 		isnt_int(cert_write(key, "/root/permdenied", 1), 0,
@@ -513,7 +517,7 @@ TESTS {
 	}
 
 	subtest { /* change keys * rescan */
-		cert_t *key = cert_generate(CW_CERT_TYPE_SIGNING);
+		cert_t *key = cert_generate(VIGOR_CERT_SIGNING);
 		uint8_t oldpub[32], oldsec[32];
 
 		memcpy(oldpub, key->pubkey_bin, 32);
@@ -533,7 +537,7 @@ TESTS {
 	}
 
 	subtest { /* message sealing - basic cases */
-		cert_t *key = cert_generate(CW_CERT_TYPE_SIGNING);
+		cert_t *key = cert_generate(VIGOR_CERT_SIGNING);
 		isnt_null(key, "Generated a new keypair for sealing messages");
 
 		char *unsealed = strdup("this is my message;"

@@ -13,12 +13,12 @@
 
  */
 
-static int CW_CERT_KEYSIZE[2] = { 32, 64 };
+static int VIGOR_CERT_KEYSIZE[2] = { 32, 64 };
 
 cert_t* cert_new(int type)
 {
-	if (type != CW_CERT_TYPE_ENCRYPTION
-	 && type != CW_CERT_TYPE_SIGNING)
+	if (type != VIGOR_CERT_ENCRYPTION
+	 && type != VIGOR_CERT_SIGNING)
 		return NULL;
 
 	cert_t *key = vmalloc(sizeof(cert_t));
@@ -39,7 +39,7 @@ cert_t* cert_make(int type, const char *pub, const char *sec)
 	}
 
 	if (sec) {
-		int ksz = CW_CERT_KEYSIZE[key->type];
+		int ksz = VIGOR_CERT_KEYSIZE[key->type];
 		if (strlen(sec) != ksz * 2) goto bail_out;
 
 		strncpy(key->seckey_b16, sec, ksz * 2);
@@ -63,7 +63,7 @@ cert_t* cert_generate(int type)
 
 	int rc;
 
-	if (type == CW_CERT_TYPE_ENCRYPTION) {
+	if (type == VIGOR_CERT_ENCRYPTION) {
 		rc = crypto_box_keypair(key->pubkey_bin, key->seckey_bin);
 		assert(rc == 0);
 	} else {
@@ -75,7 +75,7 @@ cert_t* cert_generate(int type)
 	assert(rc == 64);
 	key->pubkey = 1;
 
-	int ksz = CW_CERT_KEYSIZE[type];
+	int ksz = VIGOR_CERT_KEYSIZE[type];
 	rc = base16_encode(key->seckey_b16, ksz * 2, key->seckey_bin, ksz);
 	assert(rc == ksz * 2);
 	key->seckey = 1;
@@ -117,15 +117,15 @@ cert_t* cert_readio(FILE *io)
 	cert_t *key;
 	if (config_isset(&cfg, "\%signing")
 	 && strcmp(config_get(&cfg, "\%signing"), "v1") == 0) {
-		key = cert_new(CW_CERT_TYPE_SIGNING);
+		key = cert_new(VIGOR_CERT_SIGNING);
 
 	} else if (config_isset(&cfg, "\%encryption")
 	 && strcmp(config_get(&cfg, "\%encryption"), "v1") == 0) {
-		key = cert_new(CW_CERT_TYPE_ENCRYPTION);
+		key = cert_new(VIGOR_CERT_ENCRYPTION);
 
 	} else {
 		// legacy behavior
-		key = cert_new(CW_CERT_TYPE_ENCRYPTION);
+		key = cert_new(VIGOR_CERT_ENCRYPTION);
 	}
 	assert(key);
 
@@ -144,7 +144,7 @@ cert_t* cert_readio(FILE *io)
 	}
 
 	if (config_isset(&cfg, "sec")) {
-		int ksz = CW_CERT_KEYSIZE[key->type];
+		int ksz = VIGOR_CERT_KEYSIZE[key->type];
 		v = config_get(&cfg, "sec");
 		if (strlen(v) != ksz * 2) goto bail_out;
 
@@ -183,7 +183,7 @@ int cert_writeio(cert_t *key, FILE *io, int full)
 	assert(key);
 	assert(io);
 
-	fprintf(io, "%%%s v1\n", key->type == CW_CERT_TYPE_ENCRYPTION
+	fprintf(io, "%%%s v1\n", key->type == VIGOR_CERT_ENCRYPTION
 		                                ? "encryption" : "signing");
 
 	if (key->ident)          fprintf(io, "id  %s\n", key->ident);
@@ -238,7 +238,7 @@ int cert_rescan(cert_t *key)
 	}
 
 	if (key->seckey) {
-		int ksz = CW_CERT_KEYSIZE[key->type];
+		int ksz = VIGOR_CERT_KEYSIZE[key->type];
 		rc = base16_decode(key->seckey_bin, ksz, key->seckey_b16, ksz * 2);
 		if (rc != ksz) return -1;
 	}
@@ -258,7 +258,7 @@ int cert_encode(cert_t *key)
 	}
 
 	if (key->seckey) {
-		int ksz = CW_CERT_KEYSIZE[key->type];
+		int ksz = VIGOR_CERT_KEYSIZE[key->type];
 		rc = base16_encode(key->seckey_b16, ksz * 2, key->seckey_bin, ksz);
 		if (rc != ksz * 2) return -1;
 	}

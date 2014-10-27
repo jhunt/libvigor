@@ -460,8 +460,8 @@ void seed_randomness(void);
 
  */
 
-#define CW_CERT_TYPE_ENCRYPTION 0
-#define CW_CERT_TYPE_SIGNING    1
+#define VIGOR_CERT_ENCRYPTION 0
+#define VIGOR_CERT_SIGNING    1
 
 typedef struct {
 	char   *ident;
