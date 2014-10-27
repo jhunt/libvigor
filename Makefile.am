@@ -109,6 +109,8 @@ EXTRA_DIST  = README COPYING
 EXTRA_DIST += bootstrap
 EXTRA_DIST += t/data
 
+EXTRA_CLEAN = docs
+
 test-data:
 	rm -f t/tmp/check-data-install.stamp
 	make t/tmp/check-data-install.stamp
@@ -132,6 +134,10 @@ manifest:
 
 test: check
 
+docs:
+	rm -fr docs
+	mkdir docs
+	cdoc -R docs -s '(include|src)/' src/* include/*
 
 clean-local: clean-local-check clean-local-cov
 clean-local-check:
