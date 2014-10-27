@@ -67,34 +67,42 @@ TESTS {
 		LIST(l);
 
 		ok(list_isempty(&l), "LIST is empty by default");
+		is_int(list_len(&l), 0, "empty list has 0 elements");
 
 		list_push(&l, &n2->entry);
 		is_int(head_number(&l),  8, "head([8])");
 		is_int(tail_number(&l),  8, "tail([8])");
+		is_int(list_len(&l), 1, "len([8])");
 
 		list_unshift(&l, &n1->entry);
 		is_int(head_number(&l),  4, "head([4, 8])");
 		is_int(tail_number(&l),  8, "tail([4, 8])");
+		is_int(list_len(&l), 2, "len([4, 8])");
 
 		list_push(&l, &n3->entry);
 		is_int(head_number(&l),  4, "head([4, 8, 15])");
 		is_int(tail_number(&l), 15, "tail([4, 8, 15])");
+		is_int(list_len(&l), 3, "len([4, 8, 15])");
 
 		list_delete(&n1->entry);
 		is_int(head_number(&l),  8, "head([8, 15])");
 		is_int(tail_number(&l), 15, "tail([8, 15])");
+		is_int(list_len(&l), 2, "len([8, 15])");
 
 		list_push(&l, &n1->entry);
 		is_int(head_number(&l),  8, "head([8, 15, 4])");
 		is_int(tail_number(&l),  4, "tail([8, 15, 4])");
+		is_int(list_len(&l), 3, "len([8, 15, 4])");
 
 		list_delete(&n3->entry);
 		is_int(head_number(&l),  8, "head([8, 4])");
 		is_int(tail_number(&l),  4, "tail([8, 4])");
+		is_int(list_len(&l), 2, "len([8, 4])");
 
 		list_delete(&n2->entry);
 		is_int(head_number(&l),  4, "head([4])");
 		is_int(tail_number(&l),  4, "tail([4])");
+		is_int(list_len(&l), 1, "len([4])");
 
 		free(n1); free(n2); free(n3);
 	}
@@ -147,6 +155,39 @@ TESTS {
 
 		free(n4); free(n8); free(n15); free(n16); free(n23); free(n42);
 	}
+
+	subtest {
+		LIST(l);
+		NUMBER(n1, 1); list_push(&l, &n1->entry);
+		NUMBER(n2, 2); list_push(&l, &n2->entry);
+		NUMBER(n3, 4); list_push(&l, &n3->entry);
+		NUMBER(n4, 8); list_push(&l, &n4->entry);
+		is_int(sum(&l), 15, "sum([1, 2, 4, 8])");
+
+		list_t *x;
+		struct number *n;
+
+		x = list_shift(&l); n = list_object(x, struct number, entry);
+		is_int(n->value, 1, "shift([1, 2, 4, 8])");
+		is_int(sum(&l), 14, "sum([2, 4, 8])");
+
+		x = list_shift(&l); n = list_object(x, struct number, entry);
+		is_int(n->value, 2, "shift([2, 4, 8])");
+		is_int(sum(&l), 12, "sum([4, 8])");
+
+		x = list_pop(&l); n = list_object(x, struct number, entry);
+		is_int(n->value, 8, "pop([4, 8])");
+		is_int(sum(&l), 4, "sum([4])");
+
+		x = list_pop(&l); n = list_object(x, struct number, entry);
+		is_int(n->value, 4, "pop([4])");
+		is_int(sum(&l), 0, "sum([])");
+
+		is_null(list_pop(&l), "pop([])");
+		is_null(list_shift(&l), "shift([])");
+
+		free(n1); free(n2); free(n3); free(n4);
+	};
 
 	done_testing();
 }
