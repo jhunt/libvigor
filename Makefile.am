@@ -80,9 +80,6 @@ EXTRA_DIST += t/data
 test-data:
 	rm -f t/tmp/check-data-install.stamp
 	make t/tmp/check-data-install.stamp
-clean-local-check:
-	rm -fr t/tmp/*
-	rm -f check-data-install.stamp
 check_DATA = t/tmp/check-data-install.stamp
 t/tmp/check-data-install.stamp:
 	mkdir -p t/tmp
@@ -104,14 +101,13 @@ manifest:
 test: check
 
 
-.PHONY: coverage-clean coverage-report coverage clean-local-check clean-local-cov
 clean-local: clean-local-check clean-local-gcda
-clean-local-gcda:
-	touch sacrificial.gcda
-	find . -name '*.gc??' | xargs rm
 clean-local-check:
 	rm -fr t/tmp/*
 	rm -f check-data-install.stamp
+clean-local-gcda:
+	touch sacrificial.gcda
+	find . -name '*.gc??' | xargs rm
 
 if GCOV_ENABLED
 coverage-clean:
