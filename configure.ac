@@ -15,8 +15,9 @@ LT_INIT
 AC_HAVE_LIBRARY(ctap,,
 	AC_MSG_ERROR(Missing ctap testing library - see http://github.com/filefrog/ctap))
 
-AC_HAVE_LIBRARY(zmq,,
-	AC_MSG_ERROR(Missing 0MQ library))
+AC_CHECK_LIB(zmq,
+	zmq_msg_send,,
+	AC_MSG_ERROR(Missing a recent vintage 0MQ library))
 
 AC_CHECK_LIB(sodium,
 	crypto_box_keypair,,
