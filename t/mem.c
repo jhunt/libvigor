@@ -33,4 +33,26 @@ TESTS {
 		isnt_null(buf, "vcalloc() returned a non-NULL pointer");
 		ok(memcmp(val, buf, 12) == 0, "vcalloc() zeros out allocated memory");
 	}
+
+	subtest { /* out-of-memory condition */
+		pid_t pid = fork();
+		if (pid < 0) BAIL_OUT("Failed to fork; unable to run setrlimit/oom test");
+
+		if (pid > 0) {
+			int status;
+			waitpid(pid, &status, 0);
+			ok(WIFEXITED(status), "child process exited of its own free will");
+			is_int(WEXITSTATUS(status), 42, "child OOMed and exited 42 (from vmalloc)");
+		} else {
+			/* artifically constrain our memory usage */
+			struct rlimit rlim;
+			if (getrlimit(RLIMIT_AS, &rlim) != 0) exit(0);
+			rlim.rlim_cur = rlim.rlim_max = 10240000; /* ~10MiB */
+			if (setrlimit(RLIMIT_AS, &rlim) != 0) exit(0);
+
+			/* this should kill us */
+			vmalloc(rlim.rlim_cur + 1);
+			exit(0);
+		}
+	}
 }
