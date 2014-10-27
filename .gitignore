@@ -33,6 +33,7 @@ t/cache
 t/cert
 t/hash
 t/list
+t/lock
 t/log
 t/mem
 t/mq
