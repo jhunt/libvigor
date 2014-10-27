@@ -8,6 +8,7 @@ ACLOCAL_AMFLAGS  = -I build
 ############################################################
 
 AM_CFLAGS = -Iinclude -Wall $(DEPS_CFLAGS)
+AM_CFLAGS += @GCOV_CFLAGS@
 
 ############################################################
 
@@ -101,3 +102,39 @@ manifest:
 	@echo >&2 "nothin doin"
 
 test: check
+
+
+.PHONY: coverage-clean coverage-report coverage clean-local-check clean-local-cov
+clean-local: clean-local-check clean-local-gcda
+clean-local-gcda:
+	touch sacrificial.gcda
+	find . -name '*.gc??' | xargs rm
+clean-local-check:
+	rm -fr t/tmp/*
+	rm -f check-data-install.stamp
+
+if GCOV_ENABLED
+coverage-clean:
+	@rm -fr coverage
+	@find . -name "*.gcda" -exec rm {} \;
+	@lcov --directory . --zerocounters
+
+coverage-report:
+	@mkdir -p coverage
+	@lcov --compat-libtool --directory . --base-directory . --capture --output-file coverage/app.info
+	@genhtml -o coverage/ coverage/app.info
+
+coverage:
+	@make coverage-report
+
+clean-local-cov:
+	@make coverage-clean
+
+check:
+	@make coverage
+
+else
+coverage:
+	@echo >&2 "nothin doin"
+clean-local-cov:
+endif

@@ -6,7 +6,10 @@ stamp-h1
 autom4te.cache
 aclocal.m4
 libtool
-build
+build/*
+!build/coverage.m4
+!build/as-compiler-flag.m4
+coverage
 configure
 config.status
 Makefile
@@ -21,6 +24,8 @@ config.h
 *.o
 *.trs
 *.log
+*.gcda
+*.gcno
 
 t/basex
 t/cache
