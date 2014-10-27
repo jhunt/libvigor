@@ -38,8 +38,10 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <sys/time.h>
+#include <zmq.h>
 
-#define vmalloc(l) mem_vmalloc((l), __func__, __FILE__, __LINE__)
+#define vmalloc(l)   mem_vmalloc(    (l), __func__, __FILE__, __LINE__)
+#define vcalloc(n,l) mem_vmalloc((n)*(l), __func__, __FILE__, __LINE__)
 void* mem_vmalloc(size_t, const char*, const char*, unsigned int);
 
 /*
@@ -513,5 +515,62 @@ void trustdb_destroy(trustdb_t *ca);
 int trustdb_trust(trustdb_t *ca, cert_t *key);
 int trustdb_revoke(trustdb_t *ca, cert_t *key);
 int trustdb_verify(trustdb_t *ca, cert_t *key, const char *ident);
+
+/*
+
+    ##     ##  #######
+    ###   ### ##     ##
+    #### #### ##     ##
+    ## ### ## ##     ##
+    ##     ## ##  ## ##
+    ##     ## ##    ##
+    ##     ##  ##### ##
+
+*/
+
+#define VIGOR_FRAME_FINAL      1
+#define VIGOR_FRAME_PRINTABLE  2
+
+typedef struct {
+	list_t     l;
+	zmq_msg_t  msg;
+	uint8_t    flags;
+} frame_t;
+
+typedef struct {
+	frame_t *address;
+	char    *peer;
+	char    *type;
+	int      len;
+	list_t   frames;
+} pdu_t;
+
+frame_t* frame_new(const void *buf, size_t len, uint8_t flags);
+void frame_free(frame_t *f);
+int frame_eq(frame_t *a, frame_t *b);
+#define frame_data(f) zmq_msg_data(&(f)->msg)
+#define frame_size(f) zmq_msg_size(&(f)->msg)
+char* frame_hex(frame_t *f);
+
+#define frame_isfinal(f)     ((f)->flags & VIGOR_FRAME_FINAL)
+#define frame_isprintable(f) ((f)->flags & VIGOR_FRAME_PRINTABLE)
+
+pdu_t* pdu_new(void);
+pdu_t* pdu_make(const char *type, size_t n, ...);
+pdu_t* pdu_reply(pdu_t *p, const char *type, size_t n, ...);
+void pdu_free(pdu_t *p);
+
+int pdu_extend (pdu_t *p, const void *buf, size_t len);
+int pdu_extendf(pdu_t *p, const char *fmt, ...);
+
+frame_t* pdu_frame(pdu_t *p, unsigned int i);
+char* pdu_string(pdu_t *p, unsigned int i);
+
+int pdu_send(pdu_t *p, void *zocket);
+int pdu_send_and_free(pdu_t *p, void *zocket);
+pdu_t* pdu_recv(void *zocket);
+
+void pdu_fprint(pdu_t *p, FILE *io);
+#define pdu_print(p) pdu_fprint((p), stderr)
 
 #endif
