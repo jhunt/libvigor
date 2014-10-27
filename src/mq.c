@@ -228,8 +228,8 @@ char* pdu_peer(pdu_t *p)
 		size_t i, len = s_frame_size(p->address);
 		const char *data = s_frame_data(p->address);
 		for (i = 0; i < len; i++) {
-			p->peer[i * 2 + 0] = hex[data[i] & 0xf0 >> 4];
-			p->peer[i * 2 + 1] = hex[data[i] & 0x0f     ];
+			p->peer[i * 2 + 0] = hex[(data[i] & 0xf0) >> 4];
+			p->peer[i * 2 + 1] = hex[ data[i] & 0x0f      ];
 		}
 	}
 	return p->peer;

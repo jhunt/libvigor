@@ -136,5 +136,39 @@ TESTS {
 		is_string(pdu_string(client_rep, 0), "PONG",    "rep: frame 0");
 		is_string(pdu_string(client_rep, 1), "ping...", "rep: frame 1");
 		is_string(pdu_string(client_rep, 2), "pong...", "rep: frame 2");
+
+		zmq_close(client);
+		zmq_close(server);
+		zmq_ctx_destroy(z);
+	}
+
+	subtest { /* mq_ident */
+		uint8_t client_id[8] = { 0xde, 0xad, 0xbe, 0xef,     0xde, 0xca, 0xfb, 0xad };
+		void *z = zmq_ctx_new(); assert(z);
+		void *server = zmq_socket(z, ZMQ_ROUTER); assert(server); mq_ident(server, NULL);
+		void *client = zmq_socket(z, ZMQ_DEALER); assert(client); mq_ident(client, client_id);
+
+		int rc = zmq_bind(server, "inproc://server");
+		assert(rc == 0);
+
+		rc = zmq_connect(client, "inproc://server");
+		assert(rc == 0);
+
+		pdu_t *c1 = pdu_make("PING1", 0);
+		ok(pdu_send(c1, client) == 0, "sent C1 PDU");
+		pdu_t *s1 = pdu_recv(server);
+		isnt_null(s1, "received S1 PDU");
+
+		pdu_t *c2 = pdu_make("PING2", 0);
+		ok(pdu_send(c2, client) == 0, "sent C2 PDU");
+		pdu_t *s2 = pdu_recv(server);
+		isnt_null(s2, "received S2 PDU");
+
+		is_string(pdu_peer(s1), "deadbeefdecafbad", "PDU peer address is a hex string");
+		is_string(pdu_peer(s1), pdu_peer(s2), "S1 and S2 PDUs are from the same peer");
+
+		zmq_close(client);
+		zmq_close(server);
+		zmq_ctx_destroy(z);
 	}
 }
