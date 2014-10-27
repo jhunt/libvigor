@@ -38,6 +38,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <sys/time.h>
+#include <syslog.h> /* so callers get LOG_* constants */
 #include <zmq.h>
 
 #define vmalloc(l)   mem_vmalloc(    (l), __func__, __FILE__, __LINE__)
