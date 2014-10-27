@@ -30,8 +30,20 @@
      ######   #######  ##    ## ##       ####  ######
  */
 
+/**
+  Set a configuration directive.
+
+  Updates $cfg so that future requests for the value of $key will
+  return $val.  Both $key and $val _must_ be strings; config_set()
+  will create copies of them as needed, for its own memory management.
+
+  Returns 0 on success.
+ */
 int config_set(config_t *cfg, const char *key, const char *val)
 {
+	assert(key);
+	assert(val);
+
 	keyval_t *kv;
 	for_each_object(kv, cfg, l) {
 		if (strcmp(kv->key, key) != 0)
@@ -50,8 +62,18 @@ int config_set(config_t *cfg, const char *key, const char *val)
 	return 0;
 }
 
+/**
+  Deletes a configuration directive.
+
+  Updates $cfg to remove all traces of $key.
+
+  Returns 0 on success.
+ */
 int config_unset(config_t *cfg, const char *key)
 {
+	assert(cfg);
+	assert(key);
+
 	keyval_t *kv, *tmp;
 	for_each_object_safe(kv, tmp, cfg, l) {
 		if (strcmp(kv->key, key) != 0)
@@ -64,8 +86,17 @@ int config_unset(config_t *cfg, const char *key)
 	return 0;
 }
 
+/**
+  Retrieve the value of a configuration directive.
+
+  Looks through $cfg, and returns the value last set for $key
+  by config_set().  If $key isn't found, returns NULL.
+ */
 char * config_get(config_t *cfg, const char *key)
 {
+	assert(cfg);
+	assert(key);
+
 	keyval_t *kv;
 	for_each_object(kv, cfg, l)
 		if (strcmp(kv->key, key) == 0)
@@ -73,8 +104,17 @@ char * config_get(config_t *cfg, const char *key)
 	return NULL;
 }
 
+/**
+  Check if $key is defined in $cfg.
+
+  Returns 1 if the given $key was found in the config object,
+  and 0 if not.  This is designed to be used in conditionals.
+ */
 int config_isset(config_t *cfg, const char *key)
 {
+	assert(cfg);
+	assert(key);
+
 	keyval_t *kv;
 	for_each_object(kv, cfg, l)
 		if (strcmp(kv->key, key) == 0)
@@ -82,8 +122,21 @@ int config_isset(config_t *cfg, const char *key)
 	return 0;
 }
 
+/**
+  Read configuration from an input stream.
+
+  This is usually used to read configuration directives and their
+  values from a file.  Key/value pairs (whitespace-separated) are
+  read from $io and set in $cfg.  Whitespace is (generally) ignored.
+  Comments start with a '#' and continue to the end of the line.
+
+  Returns 0 on success.
+ */
 int config_read(config_t *cfg, FILE *io)
 {
+	assert(cfg);
+	assert(io);
+
 	keyval_t *kv;
 	char line[8192];
 	while (fgets(line, 8191, io)) {
@@ -119,6 +172,14 @@ int config_read(config_t *cfg, FILE *io)
 	return 0;
 }
 
+/**
+  Write configuration to an output stream.
+
+  Formats $cfg as key/value pairs (whitespace-separated) and prints them,
+  one line apiece, to the $io stream.
+
+  Returns 0 on success.
+ */
 int config_write(config_t *cfg, FILE *io)
 {
 	CONFIG(uniq);
@@ -135,8 +196,16 @@ int config_write(config_t *cfg, FILE *io)
 	return 0;
 }
 
-int config_done(config_t *cfg)
+/**
+  Release memory used by the configuration.
+
+  Note that this does not free the memory taken up by $cfg itself;
+  this allows callers to define config_t objects on the stack.
+ */
+void config_done(config_t *cfg)
 {
+	assert(cfg);
+
 	keyval_t *kv, *tmp;
 	for_each_object_safe(kv, tmp, cfg, l) {
 		free(kv->key);
@@ -144,6 +213,4 @@ int config_done(config_t *cfg)
 		list_delete(&kv->l);
 		free(kv);
 	}
-	return 0;
 }
-

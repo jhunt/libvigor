@@ -180,7 +180,7 @@ char* config_get(config_t *cfg, const char *key);
 int config_isset(config_t *cfg, const char *key);
 int config_read (config_t *cfg, FILE *io);
 int config_write(config_t *cfg, FILE *io);
-int config_done (config_t *cfg);
+void config_done(config_t *cfg);
 
 /*
 
