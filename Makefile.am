@@ -69,6 +69,10 @@ CTAP_TESTS += t/mem
 t_mem_SOURCES = t/mem.c t/test.h
 t_mem_LDFLAGS = libvigor.la
 
+CTAP_TESTS += t/mq
+t_mq_SOURCES = t/mq.c t/test.h
+t_mq_LDFLAGS = libvigor.la
+
 CTAP_TESTS += t/path
 t_path_SOURCES = t/path.c t/test.h
 t_path_LDFLAGS = libvigor.la

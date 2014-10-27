@@ -528,42 +528,29 @@ int trustdb_verify(trustdb_t *ca, cert_t *key, const char *ident);
 
 */
 
-#define VIGOR_FRAME_FINAL      1
-#define VIGOR_FRAME_PRINTABLE  2
-
 typedef struct {
-	list_t     l;
-	zmq_msg_t  msg;
-	uint8_t    flags;
-} frame_t;
-
-typedef struct {
-	frame_t *address;
-	char    *peer;
-	char    *type;
-	int      len;
-	list_t   frames;
+	void   *address;
+	char   *peer;
+	char   *type;
+	int     len;
+	list_t  frames;
 } pdu_t;
 
-frame_t* frame_new(const void *buf, size_t len, uint8_t flags);
-void frame_free(frame_t *f);
-int frame_eq(frame_t *a, frame_t *b);
-#define frame_data(f) zmq_msg_data(&(f)->msg)
-#define frame_size(f) zmq_msg_size(&(f)->msg)
-char* frame_hex(frame_t *f);
-
-#define frame_isfinal(f)     ((f)->flags & VIGOR_FRAME_FINAL)
-#define frame_isprintable(f) ((f)->flags & VIGOR_FRAME_PRINTABLE)
+void* mq_ident(void *zocket, void *id);
 
 pdu_t* pdu_new(void);
 pdu_t* pdu_make(const char *type, size_t n, ...);
 pdu_t* pdu_reply(pdu_t *p, const char *type, size_t n, ...);
 void pdu_free(pdu_t *p);
 
+#define pdu_size(p) ((p)->len)
+char* pdu_peer(pdu_t *p);
+char* pdu_type(pdu_t *p);
+
 int pdu_extend (pdu_t *p, const void *buf, size_t len);
 int pdu_extendf(pdu_t *p, const char *fmt, ...);
 
-frame_t* pdu_frame(pdu_t *p, unsigned int i);
+uint8_t* pdu_segment(pdu_t *p, unsigned int i, size_t *len);
 char* pdu_string(pdu_t *p, unsigned int i);
 
 int pdu_send(pdu_t *p, void *zocket);

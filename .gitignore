@@ -34,6 +34,7 @@ t/cert
 t/hash
 t/list
 t/mem
+t/mq
 t/path
 t/strings
 

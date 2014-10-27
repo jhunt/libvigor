@@ -31,7 +31,7 @@
  */
 
 static int VIGOR_RAND_SEED = 0;
-void cw_srand(void)
+void seed_randomness(void)
 {
 	if (VIGOR_RAND_SEED) return;
 	srand(VIGOR_RAND_SEED = time_ms());

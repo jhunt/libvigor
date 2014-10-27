@@ -20,18 +20,70 @@
 #include <vigor.h>
 #include "impl.h"
 
+#define VIGOR_FRAME_FINAL      1
+#define VIGOR_FRAME_PRINTABLE  2
+
+typedef struct {
+	list_t     l;
+	zmq_msg_t  msg;
+	uint8_t    flags;
+} frame_t;
+
+#define FRAME(f) ((frame_t*)(f))
+
+#define s_frame_data(f) zmq_msg_data(&(FRAME(f))->msg)
+#define s_frame_size(f) zmq_msg_size(&(FRAME(f))->msg)
+#define s_frame_isfinal(f)     ((FRAME(f))->flags & VIGOR_FRAME_FINAL)
+#define s_frame_isprintable(f) ((FRAME(f))->flags & VIGOR_FRAME_PRINTABLE)
+
 static void s_frame_scan(frame_t *f)
 {
 	assert(f);
 
-	const char *data = frame_data(f);
+	const char *data = s_frame_data(f);
 	size_t i;
 	f->flags |= VIGOR_FRAME_PRINTABLE;
-	for (i = 0; i < frame_size(f); i++) {
+	for (i = 0; i < s_frame_size(f); i++) {
 		if (isprint(data[i])) continue;
 		f->flags &= ~VIGOR_FRAME_PRINTABLE;
 		break;
 	}
+}
+
+frame_t* s_frame_new(const void *buf, size_t len, uint8_t flags)
+{
+	assert(buf);
+	assert(len >= 0);
+
+	frame_t *f = vmalloc(sizeof(frame_t));
+	list_init(&f->l);
+
+	int rc = zmq_msg_init_size(&f->msg, len);
+	if (rc != 0) {
+		free(f);
+		return NULL;
+	}
+	memcpy(s_frame_data(f), buf, len);
+
+	f->flags = flags;
+	s_frame_scan(f);
+
+	return f;
+}
+
+void s_frame_free(frame_t *f)
+{
+	if (!f) return;
+	list_delete(&f->l);
+	zmq_msg_close(&f->msg);
+	free(f);
+}
+
+static frame_t *s_blank_frame(void)
+{
+	static frame_t *blank = NULL;
+	if (!blank) blank = s_frame_new("", 0, 0);
+	return blank;
 }
 
 static frame_t* s_frame_recv(void *zocket)
@@ -39,6 +91,8 @@ static frame_t* s_frame_recv(void *zocket)
 	assert(zocket);
 
 	frame_t *f = vmalloc(sizeof(frame_t));
+	list_init(&f->l);
+
 	int rc = zmq_msg_init(&f->msg);
 	assert(rc == 0);
 
@@ -53,17 +107,20 @@ static frame_t* s_frame_recv(void *zocket)
 	rc = zmq_getsockopt(zocket, ZMQ_RCVMORE, &more, &len);
 	assert(rc == 0);
 
+	if (more) f->flags &= ~VIGOR_FRAME_FINAL;
+	else      f->flags |=  VIGOR_FRAME_FINAL;
+
 	s_frame_scan(f);
 	return f;
 }
 
 static void s_frame_fprint(frame_t *f, FILE *io)
 {
-	fprintf(io, "[%i] ", (int)frame_size(f));
+	fprintf(io, "[% 5i] ", (int)s_frame_size(f));
 
-	char *data = frame_data(f);
-	size_t len = frame_size(f);
-	size_t max = frame_isprintable(f) ? 70 : 35;
+	char *data = s_frame_data(f);
+	size_t len = s_frame_size(f);
+	size_t max = s_frame_isprintable(f) ? 70 : 35;
 	const char *ellips = "";
 	if (len > max) {
 		len = max;
@@ -72,8 +129,18 @@ static void s_frame_fprint(frame_t *f, FILE *io)
 
 	size_t i;
 	for (i = 0; i < len; i++)
-		fprintf(io, (frame_isprintable(f) ? "%c" : "%02x"), (data[i]));
-	fprintf(io, "%s%s\n", ellips, (frame_isfinal(f) ? "" : " (+)"));
+		fprintf(io, (s_frame_isprintable(f) ? "%c" : "%02x"), (data[i]));
+	fprintf(io, "%s%s\n", ellips, (s_frame_isfinal(f) ? "" : " (+)"));
+}
+
+static frame_t* s_pdu_frame(pdu_t *p, unsigned int i)
+{
+	assert(p);
+
+	frame_t *f;
+	for_each_object(f, &p->frames, l)
+		if (i-- == 0) return f;
+	return NULL;
 }
 
 /*
@@ -88,58 +155,21 @@ static void s_frame_fprint(frame_t *f, FILE *io)
 
 */
 
-frame_t* frame_new(const void *buf, size_t len, uint8_t flags)
+#define rnd(num) ((int)((float)(num) * random() / (RAND_MAX + 1.0)))
+void* mq_ident(void *zocket, void *buf)
 {
-	assert(buf);
-	assert(len >= 0);
-
-	frame_t *f = vmalloc(sizeof(frame_t));
-	int rc = zmq_msg_init_size(&f->msg, len);
-	if (rc != 0) {
-		free(f);
-		return NULL;
+	char *id = (char*)buf;
+	if (!id) {
+		id = vmalloc(8);
+		seed_randomness();
+		id[0] = rnd(256); id[1] = rnd(256);
+		id[2] = rnd(256); id[3] = rnd(256);
+		id[4] = rnd(256); id[5] = rnd(256);
+		id[6] = getpid() & 0xff;
+		id[7] = getpid() >> 8;
 	}
-	memcpy(frame_data(f), buf, len);
-
-	f->flags = flags;
-	s_frame_scan(f);
-
-	return f;
-}
-
-void frame_free(frame_t *f)
-{
-	if (!f) return;
-	list_delete(&f->l);
-	zmq_msg_close(&f->msg);
-	free(f);
-}
-
-int frame_eq(frame_t *a, frame_t *b)
-{
-	if (!a || !b) return 0;
-
-	size_t len = frame_size(a);
-	if (frame_size(b) != len) return 0;
-
-	return memcmp(frame_data(a), frame_data(b), len) == 0;
-}
-
-char* frame_hex(frame_t *f)
-{
-	assert(f);
-
-	static const char hex[] = "0123456789abcdef";
-	char *s = vcalloc(2 * frame_size(f) + 1, sizeof(char));
-
-	size_t i, len = frame_size(f);
-	const char *data = frame_data(f);
-	for (i = 0; i < len; i++) {
-		s[i * 2 + 0] = hex[data[i] & 0xf0 >> 4];
-		s[i * 2 + 1] = hex[data[i] & 0x0f     ];
-	}
-	s[i * 2] = '\0';
-	return s;
+	zmq_setsockopt(zocket, ZMQ_IDENTITY, id, 8);
+	return id;
 }
 
 pdu_t* pdu_new(void)
@@ -156,9 +186,7 @@ pdu_t* pdu_make(const char *type, size_t n, ...)
 	assert(n >= 0);
 
 	pdu_t *p = pdu_new();
-
-	p->type = strdup(type);
-	assert(p->type);
+	pdu_extend(p, type, strlen(type));
 
 	va_list ap;
 	va_start(ap, n);
@@ -176,13 +204,9 @@ pdu_t* pdu_reply(pdu_t *orig, const char *type, size_t n, ...)
 	assert(type);
 	assert(n >= 0);
 
-	pdu_t *p = vmalloc(sizeof(pdu_t));
-	p->address = frame_new(frame_data(orig->address), frame_size(orig->address), 0);
-
-	list_init(&p->frames);
-
-	p->type = strdup(type);
-	assert(p->type);
+	pdu_t *p = pdu_new();
+	p->address = s_frame_new(s_frame_data(orig->address), s_frame_size(orig->address), 0);
+	pdu_extend(p, type, strlen(type));
 
 	va_list ap;
 	va_start(ap, n);
@@ -195,17 +219,40 @@ pdu_t* pdu_reply(pdu_t *orig, const char *type, size_t n, ...)
 	return p;
 }
 
+char* pdu_peer(pdu_t *p)
+{
+	if (!p->peer && p->address) {
+		static const char hex[] = "0123456789abcdef";
+		p->peer = vcalloc(2 * s_frame_size(p->address) + 1, sizeof(char));
+
+		size_t i, len = s_frame_size(p->address);
+		const char *data = s_frame_data(p->address);
+		for (i = 0; i < len; i++) {
+			p->peer[i * 2 + 0] = hex[data[i] & 0xf0 >> 4];
+			p->peer[i * 2 + 1] = hex[data[i] & 0x0f     ];
+		}
+	}
+	return p->peer;
+}
+
+char* pdu_type(pdu_t *p)
+{
+	if (!p->type)
+		p->type = pdu_string(p, 0);
+	return p->type;
+}
+
 void pdu_free(pdu_t *p)
 {
 	if (!p) return;
 
-	frame_free(p->address);
+	s_frame_free(p->address);
 	free(p->peer);
 	free(p->type);
 
 	frame_t *f, *f_tmp;
 	for_each_object_safe(f, f_tmp, &p->frames, l)
-		frame_free(f);
+		s_frame_free(f);
 
 	free(p);
 }
@@ -232,7 +279,7 @@ int pdu_extend (pdu_t *p, const void *buf, size_t len)
 	assert(buf);
 	assert(len >= 0);
 
-	frame_t *f = frame_new(buf, len, 0);
+	frame_t *f = s_frame_new(buf, len, 0);
 	s_pdu_extend(p, f);
 
 	return 0;
@@ -247,32 +294,34 @@ int pdu_extendf(pdu_t *p, const char *fmt, ...)
 	va_end(ap1);
 
 	char *s = vcalloc(n + 1, sizeof(char));
-	vsnprintf(s, n, fmt, ap2);
+	vsnprintf(s, n + 1, fmt, ap2);
 	va_end(ap2);
 
 	return pdu_extend(p, s, n + 1);
 }
 
-frame_t* pdu_frame(pdu_t *p, unsigned int i)
+uint8_t* pdu_segment(pdu_t *p, unsigned int i, size_t *len)
 {
-	assert(p);
+	assert(len);
 
-	frame_t *f;
-	for_each_object(f, &p->frames, l) {
-		if (i-- == 0) return f;
-	}
-	return NULL;
+	frame_t *f = s_pdu_frame(p, i);
+	if (!f) return NULL;
+
+	*len = s_frame_size(f);
+	uint8_t *dst = vmalloc(*len);
+	memcpy(dst, s_frame_data(f), *len);
+	return dst;
 }
 
 char* pdu_string(pdu_t *p, unsigned int i)
 {
 	assert(p);
 
-	frame_t *f = pdu_frame(p, i);
+	frame_t *f = s_pdu_frame(p, i);
 	if (!f) return NULL;
 
-	char *s = vcalloc(frame_size(f) + 1, sizeof(char));
-	memcpy(s, frame_data(f), frame_size(f));
+	char *s = vcalloc(s_frame_size(f) + 1, sizeof(char));
+	memcpy(s, s_frame_data(f), s_frame_size(f));
 	return s;
 }
 
@@ -280,7 +329,7 @@ char* pdu_string(pdu_t *p, unsigned int i)
 	zmq_msg_send(&(f)->msg, (zocket), ZMQ_SNDMORE)
 
 #define s_frame_send(f,zocket) \
-	zmq_msg_send(&(f)->msg, (zocket), frame_isfinal(f) ? 0 : ZMQ_SNDMORE)
+	zmq_msg_send(&(f)->msg, (zocket), s_frame_isfinal(f) ? 0 : ZMQ_SNDMORE)
 
 int pdu_send(pdu_t *p, void *zocket)
 {
@@ -290,12 +339,12 @@ int pdu_send(pdu_t *p, void *zocket)
 	int rc;
 
 	if (p->address) {
-		rc = s_frame_sendm(p->address, zocket);
-		if (rc < 0) return rc;
-
-		rc = s_frame_sendm(p->address, zocket);
+		rc = s_frame_sendm(FRAME(p->address), zocket);
 		if (rc < 0) return rc;
 	}
+
+	rc = s_frame_sendm(s_blank_frame(), zocket);
+	if (rc < 0) return rc;
 
 	frame_t *f;
 	for_each_object(f, &p->frames, l) {
@@ -320,7 +369,7 @@ pdu_t* pdu_recv(void *zocket)
 {
 	pdu_t *p = pdu_new();
 
-	int body = 0;
+	int body = 0, fin = 0;
 	frame_t *f;
 
 	for (;;) {
@@ -329,41 +378,31 @@ pdu_t* pdu_recv(void *zocket)
 			pdu_free(p);
 			return NULL;
 		}
+		fin = s_frame_isfinal(f);
 
 		if (!body) {
-			if (frame_size(f) == 0) {
+			if (s_frame_size(f) == 0) {
 				body = 1;
-				int more = frame_isprintable(f);
-				frame_free(f);
-				if (more) continue;
-				else      break;
+				s_frame_free(f);
 
 			} else {
 				assert(!p->address);
-				p->address =f;
+				p->address = f;
 			}
 		} else {
 			s_pdu_extend(p, f);
 		}
 
-		if (frame_isprintable(f))
-			break;
+		if (fin) break;
 	}
-
-	free(p->peer);
-	p->peer = p->address ? frame_hex(p->address) : strdup("none");
-
-	free(p->type); p->type = pdu_string(p, 0);
-	if (!p->type)  p->type = strdup("NOOP");
 
 	return p;
 }
 
 void pdu_fprint(pdu_t *p, FILE *io)
 {
-	fprintf(io, "type: |%s|\n", p->type);
 	if (p->address) {
-		s_frame_fprint(p->address, io);
+		s_frame_fprint(FRAME(p->address), io);
 		fprintf(io, "---\n");
 	}
 	frame_t *f;
