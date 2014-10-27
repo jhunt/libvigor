@@ -145,11 +145,11 @@ struct hash {
 	ssize_t         bucket;
 	ssize_t         offset;
 };
-int hash_done(hash_t *h, uint8_t all);
+void hash_done(hash_t *h, uint8_t all);
 void* hash_get(const hash_t *h, const char *k);
 void* hash_set(hash_t *h, const char *k, void *v);
 void* hash_next(hash_t *h, char **k, void **v);
-int hash_merge(hash_t *a, hash_t *b);
+void hash_merge(hash_t *a, hash_t *b);
 
 #define for_each_key_value(h,k,v) \
 	for ((h)->offset = (h)->bucket = 0; \

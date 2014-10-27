@@ -20,16 +20,6 @@
 #include <vigor.h>
 #include "impl.h"
 
-/*
-    ##    ##     ###     ######   ##    ##  ########  ######
-    ##    ##    ## ##   ##    ##  ##    ##  ##       ##    ##
-    ##    ##   ##   ##  ##        ##    ##  ##       ##
-    ########  ##     ##  ######   ########  ######    ######
-    ##    ##  #########       ##  ##    ##  ##             ##
-    ##    ##  ##     ## ##    ##  ##    ##  ##       ##    ##
-    ##    ##  ##     ##  ######   ##    ##  ########  ######
- */
-
 static uint8_t s_hash64(const char *s)
 {
 	unsigned int h = 81;
@@ -67,9 +57,26 @@ static int s_hash_insert(struct hash_bkt *b, const char *k, void *v)
 	return 0;
 }
 
-/**************************************************************************/
+/*
+    ##    ##     ###     ######   ##    ##  ########  ######
+    ##    ##    ## ##   ##    ##  ##    ##  ##       ##    ##
+    ##    ##   ##   ##  ##        ##    ##  ##       ##
+    ########  ##     ##  ######   ########  ######    ######
+    ##    ##  #########       ##  ##    ##  ##             ##
+    ##    ##  ##     ## ##    ##  ##    ##  ##       ##    ##
+    ##    ##  ##     ##  ######   ##    ##  ########  ######
+ */
 
-int hash_done(hash_t *h, uint8_t all)
+/**
+  Release memory allocated to hash $h.
+
+  If the $all parameter is non-zero, values stored in the hash
+  will be freed as well.
+
+  Note that this does not free the memory that $h resides in;
+  this allows the hash_t object to be stack-allocated.
+ */
+void hash_done(hash_t *h, uint8_t all)
 {
 	ssize_t i, j;
 	if (h) {
@@ -82,9 +89,13 @@ int hash_done(hash_t *h, uint8_t all)
 			free(h->entries[i].values);
 		}
 	}
-	return 0;
 }
 
+/**
+  Retrieve the value of $k from $h.
+
+  If $k is not found in $h, NULL is returned.
+ */
 void* hash_get(const hash_t *h, const char *k)
 {
 	if (!h || !k) return NULL;
@@ -94,6 +105,15 @@ void* hash_get(const hash_t *h, const char *k)
 	return (i < 0 ? NULL : b->values[i]);
 }
 
+/**
+  Set the value of $k in hash $h to a new value, $v.
+
+  If the key does not already exist in the hash, it will
+  be inserted, and NULL will be returned.  If $k existed
+  prior to this call, its value will be overwritten by $v,
+  and the prior value will be returned (so that the caller
+  can free it).
+  */
 void* hash_set(hash_t *h, const char *k, void *v)
 {
 	if (!h || !k) return NULL;
@@ -111,6 +131,7 @@ void* hash_set(hash_t *h, const char *k, void *v)
 	return existing;
 }
 
+/* internal use; external visibility for macro loops */
 void* hash_next(hash_t *h, char **k, void **v)
 {
 	assert(h); // LCOV_EXCL_LINE
@@ -134,7 +155,10 @@ void* hash_next(hash_t *h, char **k, void **v)
 	return tmp;
 }
 
-int hash_merge(hash_t *a, hash_t *b)
+/**
+  Merge hash $b into $a, overwriting values in $a.
+ */
+void hash_merge(hash_t *a, hash_t *b)
 {
 	assert(a); // LCOV_EXCL_LINE;
 	assert(b); // LCOV_EXCL_LINE;
@@ -142,5 +166,4 @@ int hash_merge(hash_t *a, hash_t *b)
 	char *k; void *v;
 	for_each_key_value(b, k, v)
 		hash_set(a, k, v);
-	return 0;
 }
