@@ -133,13 +133,10 @@ manifest:
 test: check
 
 
-clean-local: clean-local-check clean-local-gcda
+clean-local: clean-local-check clean-local-cov
 clean-local-check:
 	rm -fr t/tmp/*
 	rm -f check-data-install.stamp
-clean-local-gcda:
-	touch sacrificial.gcda
-	find . -name '*.gc??' | xargs rm
 
 if GCOV_ENABLED
 coverage-clean:
