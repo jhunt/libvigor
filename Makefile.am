@@ -93,6 +93,10 @@ CTAP_TESTS += t/strings
 t_strings_SOURCES = t/strings.c t/test.h
 t_strings_LDFLAGS = libvigor.la
 
+CTAP_TESTS += t/time
+t_time_SOURCES = t/time.c t/test.h
+t_time_LDFLAGS = libvigor.la
+
 TESTS          = $(CTAP_TESTS)
 BUILT_TESTS    = $(CTAP_TESTS)
 check_PROGRAMS = $(CTAP_TESTS)

@@ -40,5 +40,6 @@ t/mq
 t/path
 t/proc
 t/strings
+t/time
 
 t/tmp
