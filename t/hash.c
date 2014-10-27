@@ -139,5 +139,31 @@ TESTS {
 		is_int(saw_bridge,  1, "saw the bridge key only once");
 	}
 
+	subtest {
+		hash_t a, b;
+		memset(&a, 0, sizeof(a));
+		memset(&b, 0, sizeof(b));
+
+		hash_set(&a, "only-in-a", "this value");
+		hash_set(&a, "common",    "shared from A");
+		is_string(hash_get(&a, "only-in-a"), "this value",    "only-in-a == 'this value'");
+		is_string(hash_get(&a, "common"),    "shared from A", "common    == 'shared from A'");
+		is_null(hash_get(&a, "only-in-b"), "only-in-b not set in A pre-merge");
+
+		hash_set(&b, "only-in-b", "that value");
+		hash_set(&b, "common",    "shared from B");
+		is_string(hash_get(&b, "only-in-b"), "that value",    "only-in-b == 'that value'");
+		is_string(hash_get(&b, "common"),    "shared from B", "common    == 'shared from B'");
+		is_null(hash_get(&b, "only-in-a"), "only-in-a not set in B pre-merge");
+
+		hash_merge(&a, &b);
+		is_string(hash_get(&a, "only-in-a"), "this value",    "only-in-a == 'this value'");
+		is_string(hash_get(&a, "only-in-b"), "that value",    "only-in-b == 'that value'");
+		is_string(hash_get(&a, "common"),    "shared from B", "common    == 'shared from B'");
+
+		hash_done(&a, 0);
+		hash_done(&b, 0);
+	}
+
 	done_testing();
 }
