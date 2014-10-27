@@ -33,6 +33,7 @@ t/cache
 t/cert
 t/hash
 t/list
+t/mem
 t/path
 t/strings
 
