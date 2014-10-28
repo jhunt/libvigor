@@ -41,7 +41,7 @@
 
   $expire specifies how long (in seconds) until a cache entry is eligible
   to be purged.  Cache entries will not actually be purged until the
-  cache_purge() function is called.
+  @cache_purge function is called.
 
   The interplay between $len and $expire is important, and it serves
   to ensure that the cache is useful, does not churn too much, and isn't
@@ -50,7 +50,7 @@
   On success, returns a pointer to a new `cache_t` with the given $len
   and $expire parameters.
 
-  To release the memory used by a cache, see cache_free().
+  To release the memory used by a cache, see @cache_free.
  */
 cache_t* cache_new(size_t len, int32_t expire)
 {
@@ -117,10 +117,10 @@ void cache_free(cache_t *cc)
 
   All cache entries that are expired (based on the global cache expiry)
   will be removed from the cache.  If a destructor function has been set
-  (see cache_opt()), it will be called for each purged entry.
+  (see @cache_opt), it will be called for each purged entry.
 
   The $force flag can be used to side-step the expiration logic and purge
-  all entries in the cache.  This is akin to calling cache_free(), except
+  all entries in the cache.  This is akin to calling @cache_free, except
   that you can re-use the cache afterwards.
  */
 void cache_purge(cache_t *cc, int force)
@@ -224,7 +224,7 @@ void* cache_get(cache_t *cc, const char *id)
   On success, returns $data.  On failure, returns NULL.
 
   Failure could indicate that the cache is full.  This function does
-  not implicitly call cache_purge(); that is left to the caller.
+  not implicitly call @cache_purge; that is left to the caller.
  */
 void* cache_set(cache_t *cc, const char *id, void *data)
 {

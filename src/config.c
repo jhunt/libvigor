@@ -34,7 +34,7 @@
   Set a configuration directive.
 
   Updates $cfg so that future requests for the value of $key will
-  return $val.  Both $key and $val _must_ be strings; config_set()
+  return $val.  Both $key and $val _must_ be strings; @config_set
   will create copies of them as needed, for its own memory management.
 
   Returns 0 on success.
@@ -90,7 +90,7 @@ int config_unset(config_t *cfg, const char *key)
   Retrieve the value of a configuration directive.
 
   Looks through $cfg, and returns the value last set for $key
-  by config_set().  If $key isn't found, returns NULL.
+  by @config_set.  If $key isn't found, returns NULL.
  */
 char * config_get(config_t *cfg, const char *key)
 {

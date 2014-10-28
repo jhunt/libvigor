@@ -141,7 +141,7 @@ int base16_encode(char *dst, size_t dlen, const void *src, size_t slen)
     - **`EINVAL`** - The $dst buffer is too small to house the decoded data.
     - **`EILSEQ`** - An illegal character was found in the input $src.
 
-  While base16_encode() will only ever produce lowercase hex digits, this
+  While @base16_encode will only ever produce lowercase hex digits, this
   implementation understands both lower- and uppsercase.
 
  */
@@ -175,7 +175,7 @@ int base16_decode(void *dst, size_t dlen, const char *src, size_t slen)
 /**
   Encode data into a NULL-terminated hex string.
 
-  A convenience wrapper around base16_encode(), this function will return
+  A convenience wrapper around @base16_encode, this function will return
   a NULL-terminated string containing the hexadecimal (base-16) representation
   of the input buffer $src, which should be $len bytes long.
 
@@ -208,7 +208,7 @@ char* base16_encodestr(const void *src, size_t len)
 /**
   Decode a hexadecimal notation into a NULL-terminated string.
 
-  A convenience wrapper around base16_decode(), this function will return
+  A convenience wrapper around @base16_decode, this function will return
   a NULL-terminated string containing the decoded binary data that the $src
   buffer represents.
 
