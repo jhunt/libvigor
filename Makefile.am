@@ -140,20 +140,22 @@ manifest:
 test: check
 
 .PHONY: docs
-docs:
-	rm -fr docs
+docs: clean-local-docs
 	mkdir docs
 	cdoc -R docs -s '(include|src)/' src/* include/*
+clean-local-docs:
+	rm -fr docs
 
-clean-local: clean-local-check clean-local-cov
+clean-local: clean-local-check clean-gcov-files clean-local-cov clean-local-docs
 clean-local-check:
 	rm -fr t/tmp/*
 	rm -f check-data-install.stamp
+clean-gcov-files:
+	@rm -fr coverage
+	@find . -name "*.gcda" -o -name "*.gcno" -exec rm {} \;
 
 if GCOV_ENABLED
 coverage-clean:
-	@rm -fr coverage
-	@find . -name "*.gcda" -exec rm {} \;
 	@lcov --directory . --zerocounters
 
 coverage-report:

@@ -25,8 +25,16 @@ TESTS {
 		is_int(proc_stat(getpid(), &ps), 0, "Got process status");
 		is_int(ps.pid,  getpid(),  "PID returned in proc_t structure");
 		is_int(ps.ppid, getppid(), "PPID returned in proc_t structure");
-		is_int(ps.euid, geteuid(), "EUID returned in proc_t structure");
-		is_int(ps.egid, getegid(), "EGID returned in proc_t structure");
+
+		if (!getenv("FAKEROOTKEY")) {
+			/* don't run these under fakeroot; /proc/$$/status and
+			   libfakeroot disagree about uid/gid/euid/egid...     */
+			is_int(ps.uid,  getuid(),  "UID returned in proc_t structure");
+			is_int(ps.gid,  getgid(),  "GID returned in proc_t structure");
+
+			is_int(ps.euid, geteuid(), "EUID returned in proc_t structure");
+			is_int(ps.egid, getegid(), "EGID returned in proc_t structure");
+		}
 
 		pid_t child = fork();
 		if (child == 0) exit(0);

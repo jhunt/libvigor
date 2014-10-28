@@ -15,6 +15,15 @@ config.status
 Makefile
 config.h
 
+*.substvars
+*.debhelper
+*.debhelper.log
+debian/files
+debian/libvigor0-dev/
+debian/libvigor0/
+debian/tmp/
+libvigor-*.tar.gz
+
 *.Plo
 *~
 .*.swp
