@@ -39,6 +39,7 @@
 #include <fcntl.h>
 #include <netdb.h>
 #include <pwd.h>
+#include <pthread.h>
 
 #include <sodium.h>
 

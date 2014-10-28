@@ -143,6 +143,12 @@ static frame_t* s_pdu_frame(pdu_t *p, unsigned int i)
 	return NULL;
 }
 
+typedef struct {
+	pthread_t  tid;
+	void      *socket;
+	trustdb_t *tdb;
+} zap_t;
+
 /*
 
     ##     ##  #######
@@ -409,4 +415,138 @@ void pdu_fprint(pdu_t *p, FILE *io)
 	for_each_object(f, &p->frames, l)
 		s_frame_fprint(f, io);
 	fprintf(io, "END\n");
+}
+
+static char *s_zap_recv(void *socket)
+{
+	char buf[256];
+	int n = zmq_recv(socket, buf, 255, 0);
+	if (n < 0) return NULL;
+	if (n > 255) n = 255;
+	buf[n] = '\0';
+	return strdup(buf);
+}
+static int s_zap_send(void *socket, const char *s) {
+	return zmq_send(socket, s, strlen(s), 0);
+}
+static int s_zap_sendmore(void *socket, const char *s) {
+	return zmq_send(socket, s, strlen(s), ZMQ_SNDMORE);
+}
+static void* szap_thread(void *u)
+{
+	assert(u);
+	zap_t *zap = (zap_t*)u;
+
+	logger(LOG_INFO, "zap: authentication thread starting up");
+
+	for (;;) {
+		logger(LOG_DEBUG, "zap: awaiting auth packet");
+		char *version = s_zap_recv(zap->socket);
+		logger(LOG_DEBUG, "zap: inbound auth packet!");
+		if (!version) break;
+
+		char *sequence  = s_zap_recv(zap->socket);
+		char *domain    = s_zap_recv(zap->socket);
+		char *address   = s_zap_recv(zap->socket);
+		char *identity  = s_zap_recv(zap->socket);
+		char *mechanism = s_zap_recv(zap->socket);
+
+		logger(LOG_DEBUG, "zap: received frame:   version  = %s", version);
+		logger(LOG_DEBUG, "zap: received frame:   sequence = %s", sequence);
+		logger(LOG_DEBUG, "zap: received frame:   domain   = %s", domain);
+		logger(LOG_DEBUG, "zap: received frame:   address  = %s", address);
+		logger(LOG_DEBUG, "zap: received frame:   identity = %s", identity);
+
+		cert_t *key = cert_new(VIGOR_CERT_ENCRYPTION);
+		assert(key);
+		key->pubkey = 1;
+		int n = zmq_recv(zap->socket, key->pubkey_bin, 32, 0);
+		if (n != 32) goto bail_out;
+		if (strcmp(version,   "1.0")   != 0) goto bail_out;
+		if (strcmp(mechanism, "CURVE") != 0) goto bail_out;
+
+		logger(LOG_DEBUG, "zap: verified message structure");
+
+		cert_encode(key);
+		logger(LOG_DEBUG, "zap: checking public key [%s]", key->pubkey_b16);
+
+		s_zap_sendmore(zap->socket, version);
+		s_zap_sendmore(zap->socket, sequence);
+
+		if (!zap->tdb || trustdb_verify(zap->tdb, key, NULL) == 0) {
+			logger(LOG_DEBUG, "zap: granting authentication request - 200 OK");
+			s_zap_sendmore(zap->socket, "200");
+			s_zap_sendmore(zap->socket, "OK");
+			s_zap_sendmore(zap->socket, "anonymous");
+			s_zap_send    (zap->socket, "");
+		} else {
+			logger(LOG_DEBUG, "zap: rejecting authentication request - 400 Untrusted");
+			s_zap_sendmore(zap->socket, "400");
+			s_zap_sendmore(zap->socket, "Untrusted client public key");
+			s_zap_sendmore(zap->socket, "");
+			s_zap_send    (zap->socket, "");
+		}
+
+		free(version);
+		free(sequence);
+		free(domain);
+		free(address);
+		free(identity);
+		free(mechanism);
+		cert_destroy(key);
+
+		continue;
+bail_out:
+		logger(LOG_WARNING, "zap: denying curve authentication");
+		free(version);
+		free(sequence);
+		free(domain);
+		free(address);
+		free(identity);
+		free(mechanism);
+		cert_destroy(key);
+		break;
+	}
+	zmq_close(zap->socket);
+	return zap;
+}
+void* zap_startup(void *zctx, trustdb_t *tdb)
+{
+	assert(zctx);
+
+	zap_t *handle = vmalloc(sizeof(zap_t));
+	handle->tdb = tdb;
+
+	handle->socket = zmq_socket(zctx, ZMQ_REP);
+	assert(handle->socket);
+
+	int rc = zmq_bind(handle->socket, "inproc://zeromq.zap.01");
+	assert(rc == 0);
+
+	rc = pthread_create(&handle->tid, NULL, szap_thread, handle);
+	assert(rc == 0);
+
+	return handle;
+}
+
+void zap_shutdown(void *handle)
+{
+	if (!handle) return;
+
+	zap_t *z = (zap_t*)handle;
+	pthread_cancel(z->tid);
+
+	void *_;
+	pthread_join(z->tid, &_);
+
+	int linger = 400;
+	int rc = zmq_setsockopt(z->socket, ZMQ_LINGER, &linger, sizeof(linger));
+	if (rc != 0)
+		logger(LOG_ERR, "faild to set ZMQ_LINGER to 400ms on socket %p: %s",
+			z->socket, zmq_strerror(errno));
+
+	rc = zmq_close(z->socket);
+	assert(rc == 0);
+
+	free(z);
 }
