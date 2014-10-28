@@ -4,11 +4,16 @@ Maintainer: James Hunt <james@jameshunt.us>
 Section: libdevel
 Priority: optional
 Homepage: http://github.com/filefrog/vigor
-Build-Depends: debhelper (>= 8.0.0), libtool, libctap, libzmq3-dev, libsodium-dev
+Build-Depends: debhelper (>= 8.0.0),
+               libctap,
+               libctap-dev,
+               libsodium-dev,
+               libtool,
+               libzmq3-dev
 
 Package: libvigor0
 Architecture: any
-Depends: ${misc:Depends}, libzmq3, libsodium
+Depends: libsodium, libzmq3, ${misc:Depends}
 Description: Missing Bits of C
  libvigor is a set of primitives for getting past the inherent shortcomings
  of a beautifully simple language like C.  It provides robust list and hash
