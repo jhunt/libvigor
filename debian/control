@@ -1,9 +1,9 @@
 Source: libvigor
 Standards-Version: 3.9.3
 Maintainer: James Hunt <james@jameshunt.us>
-Section: libdevel
+Section: libs
 Priority: optional
-Homepage: http://github.com/filefrog/vigor
+Homepage: http://github.com/filefrog/libvigor
 Build-Depends: debhelper (>= 8.0.0),
                libctap,
                libctap-dev,
@@ -13,16 +13,17 @@ Build-Depends: debhelper (>= 8.0.0),
 
 Package: libvigor0
 Architecture: any
-Depends: libsodium13, libzmq3, ${misc:Depends}
+Depends: libsodium13, libzmq3, ${misc:Depends}, ${shlibs:Depends}
 Description: Missing Bits of C
  libvigor is a set of primitives for getting past the inherent shortcomings
  of a beautifully simple language like C.  It provides robust list and hash
  representations, and several other abstractions like daemonization, command
  execution management, a 0MQ packet layer, time and timing functions and more.
 
-Package: libvigor0-dev
-Architecture: all
-Depends: ${misc:Depends}
+Package: libvigor-dev
+Architecture: any
+Section: libdevel
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: Missing Bits of C - development tools
  libvigor is a set of primitives for getting past the inherent shortcomings
  of a beautifully simple language like C.  It provides robust list and hash
@@ -30,3 +31,16 @@ Description: Missing Bits of C - development tools
  execution management, a 0MQ packet layer, time and timing functions and more.
  .
  This package contains the header files for developing code against libvigor.
+
+Package: libvigor0-dbg
+Architecture: any
+Priority: extra
+Section: debug
+Depends: libvigor0 (= ${binary:Version}), ${misc:Depends}
+Description: Missing Bits of C
+ libvigor is a set of primitives for getting past the inherent shortcomings
+ of a beautifully simple language like C.  It provides robust list and hash
+ representations, and several other abstractions like daemonization, command
+ execution management, a 0MQ packet layer, time and timing functions and more.
+ .
+ This package contains debugging symbols for libvigor.

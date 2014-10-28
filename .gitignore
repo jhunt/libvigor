@@ -19,8 +19,9 @@ config.h
 *.debhelper
 *.debhelper.log
 debian/files
-debian/libvigor0-dev/
 debian/libvigor0/
+debian/libvigor0-dbg/
+debian/libvigor-dev/
 debian/tmp/
 libvigor-*.tar.gz
 

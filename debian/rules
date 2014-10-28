@@ -3,7 +3,8 @@
 export DH_VERBOSE=1
 export DH_OPTIONS
 # drop the assert()'s out
-export CFLAGS=-DNDEBUG
+CFLAGS = -DNDEBUG -g
+export CFLAGS
 
 #install: build
 #	dh_testdir
@@ -38,6 +39,10 @@ export CFLAGS=-DNDEBUG
 #	dh_gencontrol -a
 #	dh_md5sums -a
 #	dh_builddeb -a
+
+.PHONY: override_dh_strip
+override_dh_strip:
+	dh_strip --dbg-package=libvigor0-dbg
 
 %:
 	dh $@ 
