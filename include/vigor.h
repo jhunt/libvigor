@@ -601,6 +601,26 @@ int reactor_go(reactor_t *r);
 
 /*
 
+    #######   ##     ## ##    ##
+    ##    ##  ##     ## ###   ##
+    ##    ##  ##     ## ####  ##
+    #######   ##     ## ## ## ##
+    ##   ##   ##     ## ##  ####
+    ##    ##  ##     ## ##   ###
+    ##     ##  #######  ##    ##
+
+*/
+
+typedef struct {
+	FILE *in, *out, *err;
+	uid_t uid;
+	gid_t gid;
+} cw_runner_t;
+int run2(cw_runner_t *ctx, char *cmd, ...);
+#define run(cmd, ...) run2(NULL, cmd, __VA_ARGS__)
+
+/*
+
     ########     ###    ######## ##     ##  #######  ##    ##
     ##     ##   ## ##   ##       ###   ### ##     ## ###   ##
     ##     ##  ##   ##  ##       #### #### ##     ## ####  ##

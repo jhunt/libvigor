@@ -31,6 +31,7 @@ core_src += src/path.c
 core_src += src/proc.c
 core_src += src/rand.c
 core_src += src/reactor.c
+core_src += src/run.c
 core_src += src/signals.c
 core_src += src/strings.c
 core_src += src/time.c
