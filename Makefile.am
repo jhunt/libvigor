@@ -108,13 +108,14 @@ CTAP_TESTS += t/time
 t_time_SOURCES = t/time.c t/test.h
 t_time_LDFLAGS = libvigor.la
 
-TESTS          = $(CTAP_TESTS)
+TESTS          = $(CTAP_TESTS) t/memcheck
 BUILT_TESTS    = $(CTAP_TESTS)
 check_PROGRAMS = $(CTAP_TESTS)
 
 EXTRA_DIST  = README COPYING
 EXTRA_DIST += bootstrap
 EXTRA_DIST += t/data
+EXTRA_DIST += t/memcheck t/memleaks
 
 test-data:
 	rm -f t/tmp/check-data-install.stamp
