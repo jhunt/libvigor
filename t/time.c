@@ -20,6 +20,8 @@
 #include "test.h"
 
 TESTS {
+	setenv("TZ", "UTC", 1);
+
 	subtest {
 		stopwatch_t T;
 		int64_t ms;
@@ -55,7 +57,7 @@ TESTS {
 	subtest {
 		int32_t ts = 1234567890;
 		is_string(time_strf("[[%a, %b %d %Y at %H:%M:%S%P]]", ts),
-			"[[Fri, Feb 13 2009 at 18:31:30pm]]",
+			"[[Fri, Feb 13 2009 at 23:31:30pm]]",
 			"time formatting works");
 	}
 }
