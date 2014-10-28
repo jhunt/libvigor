@@ -23,6 +23,10 @@ AC_CHECK_LIB(sodium,
 	crypto_box_keypair,,
 	AC_MSG_ERROR(Missing sodium encryption library))
 
+AC_CHECK_LIB(pthread,
+	pthread_create,,
+	AC_MSG_ERROR(Missing POSIX threads library))
+
 AC_C_INLINE
 
 AX_TEST_COVERAGE

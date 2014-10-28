@@ -537,7 +537,8 @@ typedef struct {
 	list_t  frames;
 } pdu_t;
 
-void* mq_ident(void *zocket, void *id);
+void* vzmq_ident(void *zocket, void *id);
+void vzmq_shutdown(void *zocket, int linger);
 
 pdu_t* pdu_new(void);
 pdu_t* pdu_make(const char *type, size_t n, ...);
@@ -563,5 +564,31 @@ void pdu_fprint(pdu_t *p, FILE *io);
 
 void *zap_startup(void *zctx, trustdb_t *tdb);
 void zap_shutdown(void *handle);
+
+/*
+
+    ########  ########    ###     ######  ########  #######  ########
+    ##     ## ##         ## ##   ##    ##    ##    ##     ## ##     ##
+    ##     ## ##        ##   ##  ##          ##    ##     ## ##     ##
+    ########  ######   ##     ## ##          ##    ##     ## ########
+    ##   ##   ##       ######### ##          ##    ##     ## ##   ##
+    ##    ##  ##       ##     ## ##    ##    ##    ##     ## ##    ##
+    ##     ## ######## ##     ##  ######     ##     #######  ##     ##
+
+ */
+
+typedef struct {
+	list_t          reactors;
+	zmq_pollitem_t *poller;
+} reactor_t;
+typedef int (*reactor_fn)(void *socket, pdu_t *pdu, void *data);
+
+#define VIGOR_REACTOR_CONTINUE 0
+#define VIGOR_REACTOR_HALT     1
+
+reactor_t *reactor_new(void);
+void reactor_free(reactor_t *r);
+int reactor_set(reactor_t *r, void *socket, reactor_fn fn, void *data);
+int reactor_go(reactor_t *r);
 
 #endif

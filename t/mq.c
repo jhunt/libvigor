@@ -100,7 +100,7 @@ TESTS {
 		isnt_null(fgets(line, 8192, io), "line 5 read from file");
 		is_string(line, "END\n", "line 5");
 
-		is_null(fgets(line, 8193, io), "EOF reached");
+		is_null(fgets(line, 8192, io), "EOF reached");
 	}
 
 	subtest { /* send + receive */
@@ -137,16 +137,16 @@ TESTS {
 		is_string(pdu_string(client_rep, 1), "ping...", "rep: frame 1");
 		is_string(pdu_string(client_rep, 2), "pong...", "rep: frame 2");
 
-		zmq_close(client);
-		zmq_close(server);
+		vzmq_shutdown(client, 0);
+		vzmq_shutdown(server, 0);
 		zmq_ctx_destroy(z);
 	}
 
-	subtest { /* mq_ident */
+	subtest { /* vzmq_ident */
 		uint8_t client_id[8] = { 0xde, 0xad, 0xbe, 0xef,     0xde, 0xca, 0xfb, 0xad };
 		void *z = zmq_ctx_new(); assert(z);
-		void *server = zmq_socket(z, ZMQ_ROUTER); assert(server); mq_ident(server, NULL);
-		void *client = zmq_socket(z, ZMQ_DEALER); assert(client); mq_ident(client, client_id);
+		void *server = zmq_socket(z, ZMQ_ROUTER); assert(server); vzmq_ident(server, NULL);
+		void *client = zmq_socket(z, ZMQ_DEALER); assert(client); vzmq_ident(client, client_id);
 
 		int rc = zmq_bind(server, "inproc://server");
 		assert(rc == 0);
@@ -167,8 +167,8 @@ TESTS {
 		is_string(pdu_peer(s1), "deadbeefdecafbad", "PDU peer address is a hex string");
 		is_string(pdu_peer(s1), pdu_peer(s2), "S1 and S2 PDUs are from the same peer");
 
-		zmq_close(client);
-		zmq_close(server);
+		vzmq_shutdown(client, 0);
+		vzmq_shutdown(server, 0);
 		zmq_ctx_destroy(z);
 	}
 }

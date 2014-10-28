@@ -30,6 +30,8 @@
 #include <sys/resource.h>
 #include <sys/wait.h>
 
+#include <pthread.h>
+
 #ifndef TEST_DATA
 #define TEST_DATA "t/data"
 #endif

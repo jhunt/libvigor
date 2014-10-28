@@ -29,6 +29,7 @@ core_src += src/mq.c
 core_src += src/path.c
 core_src += src/proc.c
 core_src += src/rand.c
+core_src += src/reactor.c
 core_src += src/signals.c
 core_src += src/strings.c
 core_src += src/time.c
@@ -88,6 +89,10 @@ t_path_LDFLAGS = libvigor.la
 CTAP_TESTS += t/proc
 t_proc_SOURCES = t/proc.c t/test.h
 t_proc_LDFLAGS = libvigor.la
+
+CTAP_TESTS += t/reactor
+t_reactor_SOURCES = t/reactor.c t/test.h
+t_reactor_LDFLAGS = libvigor.la
 
 CTAP_TESTS += t/signals
 t_signals_SOURCES = t/signals.c t/test.h

@@ -103,7 +103,7 @@ static frame_t* s_frame_recv(void *zocket)
 	}
 
 	int more;
-	size_t len;
+	size_t len = sizeof(int);
 	rc = zmq_getsockopt(zocket, ZMQ_RCVMORE, &more, &len);
 	assert(rc == 0);
 
@@ -162,7 +162,7 @@ typedef struct {
 */
 
 #define rnd(num) ((int)((float)(num) * random() / (RAND_MAX + 1.0)))
-void* mq_ident(void *zocket, void *buf)
+void* vzmq_ident(void *zocket, void *buf)
 {
 	char *id = (char*)buf;
 	if (!id) {
@@ -176,6 +176,19 @@ void* mq_ident(void *zocket, void *buf)
 	}
 	zmq_setsockopt(zocket, ZMQ_IDENTITY, id, 8);
 	return id;
+}
+
+void vzmq_shutdown(void *zocket, int linger)
+{
+	if (linger < 0) linger = 500;
+	int rc = zmq_setsockopt(zocket, ZMQ_LINGER, &linger, sizeof(linger));
+	if (rc != 0)
+		logger(LOG_ERR, "failed to set ZMQ_LINGER to %i on socket %p: %s",
+			linger, zocket, zmq_strerror(errno));
+	assert(rc == 0);
+
+	rc = zmq_close(zocket);
+	assert(rc == 0);
 }
 
 pdu_t* pdu_new(void)
