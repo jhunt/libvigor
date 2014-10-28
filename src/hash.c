@@ -58,6 +58,7 @@ static int s_hash_insert(struct hash_bkt *b, const char *k, void *v)
 }
 
 /*
+
     ##    ##     ###     ######   ##    ##  ########  ######
     ##    ##    ## ##   ##    ##  ##    ##  ##       ##    ##
     ##    ##   ##   ##  ##        ##    ##  ##       ##
@@ -65,6 +66,7 @@ static int s_hash_insert(struct hash_bkt *b, const char *k, void *v)
     ##    ##  #########       ##  ##    ##  ##             ##
     ##    ##  ##     ## ##    ##  ##    ##  ##       ##    ##
     ##    ##  ##     ##  ######   ##    ##  ########  ######
+
  */
 
 /**
