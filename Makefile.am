@@ -19,6 +19,7 @@ core_src += src/basex.c
 core_src += src/cache.c
 core_src += src/config.c
 core_src += src/cert.c
+core_src += src/daemon.c
 core_src += src/fqdn.c
 core_src += src/hash.c
 core_src += src/list.c

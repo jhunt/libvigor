@@ -599,4 +599,19 @@ void reactor_free(reactor_t *r);
 int reactor_set(reactor_t *r, void *socket, reactor_fn fn, void *data);
 int reactor_go(reactor_t *r);
 
+/*
+
+    ########     ###    ######## ##     ##  #######  ##    ##
+    ##     ##   ## ##   ##       ###   ### ##     ## ###   ##
+    ##     ##  ##   ##  ##       #### #### ##     ## ####  ##
+    ##     ## ##     ## ######   ## ### ## ##     ## ## ## ##
+    ##     ## ######### ##       ##     ## ##     ## ##  ####
+    ##     ## ##     ## ##       ##     ## ##     ## ##   ###
+    ########  ##     ## ######## ##     ##  #######  ##    ##
+
+ */
+
+int daemonize(const char *pidfile, const char *user, const char *group);
+int cleanenv(int n, const char **keep);
+
 #endif
