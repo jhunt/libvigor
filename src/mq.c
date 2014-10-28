@@ -79,13 +79,6 @@ void s_frame_free(frame_t *f)
 	free(f);
 }
 
-static frame_t *s_blank_frame(void)
-{
-	static frame_t *blank = NULL;
-	if (!blank) blank = s_frame_new("", 0, 0);
-	return blank;
-}
-
 static frame_t* s_frame_recv(void *zocket)
 {
 	assert(zocket);
@@ -316,7 +309,9 @@ int pdu_extendf(pdu_t *p, const char *fmt, ...)
 	vsnprintf(s, n + 1, fmt, ap2);
 	va_end(ap2);
 
-	return pdu_extend(p, s, n + 1);
+	int rc = pdu_extend(p, s, n + 1);
+	free(s);
+	return rc;
 }
 
 uint8_t* pdu_segment(pdu_t *p, unsigned int i, size_t *len)
@@ -362,7 +357,9 @@ int pdu_send(pdu_t *p, void *zocket)
 		if (rc < 0) return rc;
 	}
 
-	rc = s_frame_sendm(s_blank_frame(), zocket);
+	frame_t *blank = s_frame_new("", 0, 0);
+	rc = s_frame_sendm(blank, zocket);
+	s_frame_free(blank);
 	if (rc < 0) return rc;
 
 	frame_t *f;

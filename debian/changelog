@@ -1,3 +1,9 @@
+libvigor (1.0.1-1) precise; urgency=low
+
+  * Fix some memory leaks
+
+ -- James Hunt <james@jameshunt.us>  Tue, 28 Oct 2014 03:11:00 -0500
+
 libvigor (1.0.0-1) precise; urgency=low
 
   * Initial Debian Package

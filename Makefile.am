@@ -115,7 +115,7 @@ check_PROGRAMS = $(CTAP_TESTS)
 EXTRA_DIST  = README COPYING
 EXTRA_DIST += bootstrap
 EXTRA_DIST += t/data
-EXTRA_DIST += t/memcheck t/memleaks
+EXTRA_DIST += t/memcheck t/memchecker
 
 test-data:
 	rm -f t/tmp/check-data-install.stamp

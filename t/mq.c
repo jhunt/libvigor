@@ -20,6 +20,8 @@
 #include "test.h"
 
 TESTS {
+	char *s;
+
 	subtest { /* pdu instantiation */
 		pdu_t *p = pdu_new();
 		isnt_null(p, "pdu_new() returns a valid pdu handle");
@@ -35,13 +37,13 @@ TESTS {
 		is_null(pdu_peer(p), "pdu_make() doesn't set peer");
 		is_string(pdu_type(p), "ERROR", "First frame is always the type");
 		is_int(pdu_size(p), 3, "PDU consists of three frames");
-		is_string(pdu_string(p, 0), "ERROR",     "frame 0");
-		is_string(pdu_string(p, 1), "404",       "frame 1");
-		is_string(pdu_string(p, 2), "Not Found", "frame 2");
+		is_string(s = pdu_string(p, 0), "ERROR",     "frame 0"); free(s);
+		is_string(s = pdu_string(p, 1), "404",       "frame 1"); free(s);
+		is_string(s = pdu_string(p, 2), "Not Found", "frame 2"); free(s);
 
-		is_null(pdu_string(p, 3), "frame 4 should not exist");
+		is_null(s = pdu_string(p, 3), "frame 4 should not exist"); free(s);
 		pdu_extendf(p, "%s:%i", "file.c", 231);
-		is_string(pdu_string(p, 3), "file.c:231", "pdu_extendf()");
+		is_string(s = pdu_string(p, 3), "file.c:231", "pdu_extendf()"); free(s);
 
 		pdu_free(p);
 	}
@@ -55,7 +57,7 @@ TESTS {
 		is_int(pdu_size(p), 2, "PDU initially only contains 2 segments");
 		pdu_extend(p, bin, 64);
 		is_int(pdu_size(p), 3, "pdu_extend() expands PDU to 3 segments");
-		is_string(pdu_string(p, 2), "", "binary segment is '\\0...'");
+		is_string(s = pdu_string(p, 2), "", "binary segment is '\\0...'"); free(s);
 
 		size_t len = 41;
 		uint8_t *res = pdu_segment(p, 2, &len);
@@ -63,6 +65,7 @@ TESTS {
 		ok(memcmp(bin, res, 64) == 0, "pdu_segment() gives the segment data");
 		is_int(len, 64, "pdu_segment() gives the length of the segment");
 
+		free(res);
 		pdu_free(p);
 	}
 
@@ -101,6 +104,8 @@ TESTS {
 		is_string(line, "END\n", "line 5");
 
 		is_null(fgets(line, 8192, io), "EOF reached");
+
+		pdu_free(p);
 	}
 
 	subtest { /* send + receive */
@@ -115,15 +120,15 @@ TESTS {
 		assert(rc == 0);
 
 		pdu_t *client_req = pdu_make("PING", 1, "payload");
-		rc = pdu_send(client_req, client);
+		rc = pdu_send_and_free(client_req, client);
 		is_int(rc, 0, "pdu_send() returns 0 on success");
 
 		pdu_t *server_req = pdu_recv(server);
 		isnt_null(server_req, "pdu_recv() returns the PDU it reads");
 		is_int(pdu_size(server_req), 2, "req: PDU is 2 segments long");
 		is_string(pdu_type(server_req), "PING", "req: type");
-		is_string(pdu_string(server_req, 0), "PING",    "req: frame 0");
-		is_string(pdu_string(server_req, 1), "payload", "req: frame 1");
+		is_string(s = pdu_string(server_req, 0), "PING",    "req: frame 0"); free(s);
+		is_string(s = pdu_string(server_req, 1), "payload", "req: frame 1"); free(s);
 
 		pdu_t *server_rep = pdu_reply(server_req, "PONG", 2, "ping...", "pong...");
 		rc = pdu_send_and_free(server_rep, server);
@@ -133,19 +138,22 @@ TESTS {
 		isnt_null(client_rep, "pdu_recv() returns the PDU it reads");
 		is_int(pdu_size(client_rep), 3, "rep: PDU is 3 segments long");
 		is_string(pdu_type(client_rep), "PONG", "rep: type");
-		is_string(pdu_string(client_rep, 0), "PONG",    "rep: frame 0");
-		is_string(pdu_string(client_rep, 1), "ping...", "rep: frame 1");
-		is_string(pdu_string(client_rep, 2), "pong...", "rep: frame 2");
+		is_string(s = pdu_string(client_rep, 0), "PONG",    "rep: frame 0"); free(s);
+		is_string(s = pdu_string(client_rep, 1), "ping...", "rep: frame 1"); free(s);
+		is_string(s = pdu_string(client_rep, 2), "pong...", "rep: frame 2"); free(s);
 
 		vzmq_shutdown(client, 0);
 		vzmq_shutdown(server, 0);
 		zmq_ctx_destroy(z);
+
+		pdu_free(server_req);
+		pdu_free(client_rep);
 	}
 
 	subtest { /* vzmq_ident */
 		uint8_t client_id[8] = { 0xde, 0xad, 0xbe, 0xef,     0xde, 0xca, 0xfb, 0xad };
 		void *z = zmq_ctx_new(); assert(z);
-		void *server = zmq_socket(z, ZMQ_ROUTER); assert(server); vzmq_ident(server, NULL);
+		void *server = zmq_socket(z, ZMQ_ROUTER); assert(server); free(vzmq_ident(server, NULL));
 		void *client = zmq_socket(z, ZMQ_DEALER); assert(client); vzmq_ident(client, client_id);
 
 		int rc = zmq_bind(server, "inproc://server");
@@ -155,17 +163,20 @@ TESTS {
 		assert(rc == 0);
 
 		pdu_t *c1 = pdu_make("PING1", 0);
-		ok(pdu_send(c1, client) == 0, "sent C1 PDU");
+		ok(pdu_send_and_free(c1, client) == 0, "sent C1 PDU");
 		pdu_t *s1 = pdu_recv(server);
 		isnt_null(s1, "received S1 PDU");
 
 		pdu_t *c2 = pdu_make("PING2", 0);
-		ok(pdu_send(c2, client) == 0, "sent C2 PDU");
+		ok(pdu_send_and_free(c2, client) == 0, "sent C2 PDU");
 		pdu_t *s2 = pdu_recv(server);
 		isnt_null(s2, "received S2 PDU");
 
 		is_string(pdu_peer(s1), "deadbeefdecafbad", "PDU peer address is a hex string");
 		is_string(pdu_peer(s1), pdu_peer(s2), "S1 and S2 PDUs are from the same peer");
+
+		pdu_free(s1);
+		pdu_free(s2);
 
 		vzmq_shutdown(client, 0);
 		vzmq_shutdown(server, 0);

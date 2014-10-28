@@ -91,11 +91,13 @@ int lock_acquire(lock_t *lock, int flags)
 	size_t n = strlen(details);
 
 	if (write(lock->fd, details, n) != n) {
+		free(details);
 		close(lock->fd);
 		unlink(lock->path);
 		return -1;
 	}
 
+	free(details);
 	lock->valid = 1;
 	return 0;
 }

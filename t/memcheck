@@ -1,22 +1,9 @@
 #!/bin/bash
-
-VG=/usr/bin/valgrind
-EFAIL=61
-
-if [[ ! -x $VG ]]; then
-	echo "SKIP: $VG not found (Valgrind not installed or otherwise unavailable)";
-	exit 77;
-fi
-
-SUPPS="t/tmp/data/vg/clockwork.supp"
-TEMPFILE=$(mktemp);
-trap "rm -f $TEMPFILE" INT TERM EXIT
-$VG --tool=memcheck --leak-check=full --show-leak-kinds=all --error-exitcode=$EFAIL --suppressions=$SUPPS 2>$TEMPFILE >/dev/null -- "$@"
-if [[ $? == $EFAIL ]]; then
-	echo "FAIL: $@"
-	cat >&2 $TEMPFILE
-	exit 1
-else
-	echo "PASS: $@"
-	exit 0
-fi
+trap "exit" INT TERM
+SCRIPTPATH=$(cd $(dirname $0); pwd -P);
+for TEST in $(find t -maxdepth 1 -type f -perm /u=x | sort); do
+	[[ "$TEST" == "t/mem"        ]] && continue # oom is bad for VG
+	[[ "$TEST" == "t/memcheck"   ]] && continue
+	[[ "$TEST" == "t/memchecker" ]] && continue
+	$SCRIPTPATH/memchecker $TEST || exit $?
+done
