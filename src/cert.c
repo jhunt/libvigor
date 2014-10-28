@@ -52,7 +52,7 @@ cert_t* cert_make(int type, const char *pub, const char *sec)
 
 bail_out:
 	errno = EINVAL;
-	cert_destroy(key);
+	cert_free(key);
 	return NULL;
 }
 
@@ -161,7 +161,7 @@ cert_t* cert_readio(FILE *io)
 bail_out:
 	errno = EINVAL;
 	config_done(&cfg);
-	cert_destroy(key);
+	cert_free(key);
 	return NULL;
 }
 
@@ -193,7 +193,7 @@ int cert_writeio(cert_t *key, FILE *io, int full)
 	return 0;
 }
 
-void cert_destroy(cert_t *key)
+void cert_free(cert_t *key)
 {
 	if (!key) return;
 	free(key->ident);
@@ -342,7 +342,7 @@ trustdb_t* trustdb_readio(FILE *io)
 	trustdb_t *ca = trustdb_new();
 	int rc = config_read(&ca->certs, io);
 	if (rc != 0) {
-		trustdb_destroy(ca);
+		trustdb_free(ca);
 		return NULL;
 	}
 
@@ -375,7 +375,7 @@ int trustdb_writeio(trustdb_t *ca, FILE *io)
 	return 0;
 }
 
-void trustdb_destroy(trustdb_t *ca)
+void trustdb_free(trustdb_t *ca)
 {
 	if (!ca) return;
 	config_done(&ca->certs);

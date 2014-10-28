@@ -493,7 +493,7 @@ static void* szap_thread(void *u)
 		free(address);
 		free(identity);
 		free(mechanism);
-		cert_destroy(key);
+		cert_free(key);
 
 		continue;
 bail_out:
@@ -504,7 +504,7 @@ bail_out:
 		free(address);
 		free(identity);
 		free(mechanism);
-		cert_destroy(key);
+		cert_free(key);
 		break;
 	}
 	zmq_close(zap->socket);

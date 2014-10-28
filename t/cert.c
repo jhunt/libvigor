@@ -41,7 +41,7 @@ TESTS {
 		ok(memcmp(key->seckey_bin, EMPTY_BIN_KEY, 32) == 0,
 			"secret key (binary) is all zeros on creation");
 
-		cert_destroy(key);
+		cert_free(key);
 		key = cert_generate(VIGOR_CERT_ENCRYPTION);
 		isnt_null(key, "cert_generate() returned a pointer");
 
@@ -64,8 +64,8 @@ TESTS {
 		ok(memcmp(key->seckey_bin, other->pubkey_bin, 32) != 0,
 			"cert_generate() generates unique secret keys");
 
-		cert_destroy(key);
-		cert_destroy(other);
+		cert_free(key);
+		cert_free(other);
 
 		key = cert_make(VIGOR_CERT_SIGNING,
 				"0394ba6c5dda02a38ad80ff80560179e8c52a9cb178d18d86490d04149ab3546",
@@ -82,7 +82,7 @@ TESTS {
 			"cert_make() populated the public key (base16) properly");
 		ok(!key->seckey, "no secret key given (NULL arg)");
 
-		cert_destroy(key);
+		cert_free(key);
 		key = cert_make(VIGOR_CERT_SIGNING,
 			"0394ba6c5dda02a38ad80ff80560179e8c52a9cb178d18d86490d04149ab3546",
 			"feb546ed444dddb23c9a3c7a72236cf32c90148649d4563d8264665f248db516"
@@ -108,7 +108,7 @@ TESTS {
 			"feb546ed444dddb23c9a3c7a72236cf32c90148649d4563d8264665f248db516"
 			"feb546ed444dddb23c9a3c7a72236cf32c90148649d4563d8264665f248db516",
 			"cert_make() populated the secret key (base16) properly");
-		cert_destroy(key);
+		cert_free(key);
 
 		key = cert_make(VIGOR_CERT_SIGNING, NULL, NULL);
 		is_null(key, "cert_make() requires a pubkey");
@@ -172,7 +172,7 @@ TESTS {
 
 		is_string(key->ident, "some.host.some.where", "Read identity from combined.crt");
 
-		cert_destroy(key);
+		cert_free(key);
 	}
 
 	subtest { /* read in (pub) */
@@ -190,7 +190,7 @@ TESTS {
 			"Read the correct public key (binary) from public.crt");
 		is_string(key->ident, "some.host.some.where", "Read identity from public.crt");
 
-		cert_destroy(key);
+		cert_free(key);
 	}
 
 	subtest { /* write out (full) */
@@ -210,8 +210,8 @@ TESTS {
 		is_string(other->pubkey_b16, key->pubkey_b16, "pubkey matches (write/reread)");
 		is_string(other->seckey_b16, key->seckey_b16, "seckey matches (write/reread)");
 
-		cert_destroy(key);
-		cert_destroy(other);
+		cert_free(key);
+		cert_free(other);
 	}
 
 	subtest { /* write out (!full) */
@@ -231,8 +231,8 @@ TESTS {
 		is_string(other->pubkey_b16, key->pubkey_b16, "pubkey matches (write/reread)");
 		isnt_string(other->seckey_b16, key->seckey_b16, "seckey does not match (write/reread)");
 
-		cert_destroy(key);
-		cert_destroy(other);
+		cert_free(key);
+		cert_free(other);
 	}
 
 	subtest { /* change keys * rescan */
@@ -252,7 +252,7 @@ TESTS {
 		ok(memcmp(oldpub, key->pubkey_bin, 32) != 0, "old public key still no longer valid");
 		ok(memcmp(oldsec, key->seckey_bin, 32) != 0, "old secret key still no longer valid");
 
-		cert_destroy(key);
+		cert_free(key);
 	}
 
 	/************************************************************************/
@@ -261,7 +261,7 @@ TESTS {
 		trustdb_t *ca = trustdb_new();
 		isnt_null(ca, "trustdb_new() returns a new CA pointer");
 		ok(ca->verify, "By default, CA will verify certs");
-		trustdb_destroy(ca);
+		trustdb_free(ca);
 	}
 
 	subtest { /* verify modes */
@@ -305,8 +305,8 @@ TESTS {
 		ok(trustdb_verify(ca, key, fqdn) != 0, "[verify=yes] new key is not verified, with ident check (revoked)");
 		ok(trustdb_verify(ca, key, fail) != 0, "[verify=yes] new key is not verified, failed ident check (revoked)");
 
-		cert_destroy(key);
-		trustdb_destroy(ca);
+		cert_free(key);
+		trustdb_free(ca);
 	}
 
 	subtest { /* read CA list */
@@ -322,9 +322,9 @@ TESTS {
 		is_int(trustdb_verify(ca, key, NULL), 0, "key for some.host.some.where is verified");
 		isnt_int(trustdb_verify(ca, other, NULL), 0, "new key not trusted");
 
-		trustdb_destroy(ca);
-		cert_destroy(other);
-		cert_destroy(key);
+		trustdb_free(ca);
+		cert_free(other);
+		cert_free(key);
 	}
 
 	subtest { /* write CA list */
@@ -344,16 +344,16 @@ TESTS {
 		is_int(trustdb_write(ca, TEST_TMP "/trusted"), 0,
 			"wrote certificate authority to " TEST_TMP "/trusted");
 
-		trustdb_destroy(ca);
+		trustdb_free(ca);
 		ca = trustdb_read(TEST_TMP "/trusted");
 		isnt_null(ca, "re-read certificate authority");
 
 		isnt_int(trustdb_verify(ca, key, NULL), 0, "some.host.some.where not trusted by on-disk CA");
 		is_int(trustdb_verify(ca, other, NULL), 0, "xyz.host trusted by on-disk CA");
 
-		trustdb_destroy(ca);
-		cert_destroy(key);
-		cert_destroy(other);
+		trustdb_free(ca);
+		cert_free(key);
+		cert_free(other);
 	}
 
 	/************************************************************************/
@@ -371,7 +371,7 @@ TESTS {
 		ok(memcmp(key->seckey_bin, EMPTY_BIN_KEY EMPTY_BIN_KEY, 64) == 0,
 			"secret key (binary) is all zeros on creation");
 
-		cert_destroy(key);
+		cert_free(key);
 		key = cert_generate(VIGOR_CERT_SIGNING);
 		isnt_null(key, "cert_generate() returned a pointer");
 
@@ -392,8 +392,8 @@ TESTS {
 		ok(memcmp(key->seckey_bin, other->pubkey_bin, 32) != 0,
 			"cert_generate() generates unique secret keys");
 
-		cert_destroy(key);
-		cert_destroy(other);
+		cert_free(key);
+		cert_free(other);
 	}
 
 	subtest { /* read in (combined pub+sec) */
@@ -453,7 +453,7 @@ TESTS {
 
 		is_string(key->ident, "some.host.some.where", "Read identity from combined.key");
 
-		cert_destroy(key);
+		cert_free(key);
 	}
 
 	subtest { /* read in (pub) */
@@ -471,7 +471,7 @@ TESTS {
 			"Read the correct public key (binary) from public.key");
 		is_string(key->ident, "some.host.some.where", "Read identity from public.key");
 
-		cert_destroy(key);
+		cert_free(key);
 	}
 
 	subtest { /* write out (full) */
@@ -491,8 +491,8 @@ TESTS {
 		is_string(other->pubkey_b16, key->pubkey_b16, "pubkey matches (write/reread)");
 		is_string(other->seckey_b16, key->seckey_b16, "seckey matches (write/reread)");
 
-		cert_destroy(key);
-		cert_destroy(other);
+		cert_free(key);
+		cert_free(other);
 	}
 
 	subtest { /* write out (!full) */
@@ -512,8 +512,8 @@ TESTS {
 		is_string(other->pubkey_b16, key->pubkey_b16, "pubkey matches (write/reread)");
 		isnt_string(other->seckey_b16, key->seckey_b16, "seckey does not match (write/reread)");
 
-		cert_destroy(key);
-		cert_destroy(other);
+		cert_free(key);
+		cert_free(other);
 	}
 
 	subtest { /* change keys * rescan */
@@ -533,7 +533,7 @@ TESTS {
 		ok(memcmp(oldpub, key->pubkey_bin, 32) != 0, "old public key still no longer valid");
 		ok(memcmp(oldsec, key->seckey_bin, 32) != 0, "old secret key still no longer valid");
 
-		cert_destroy(key);
+		cert_free(key);
 	}
 
 	subtest { /* message sealing - basic cases */
@@ -555,7 +555,7 @@ TESTS {
 
 		free(unsealed);
 		free(sealed);
-		cert_destroy(key);
+		cert_free(key);
 	}
 
 	done_testing();

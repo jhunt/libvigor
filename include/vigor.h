@@ -491,7 +491,7 @@ cert_t* cert_readio(FILE *io);
 int cert_write(cert_t *key, const char *path, int full);
 int cert_writeio(cert_t *key, FILE *io, int full);
 
-void cert_destroy(cert_t *key);
+void cert_free(cert_t *key);
 
 uint8_t *cert_public(cert_t *key);
 uint8_t *cert_secret(cert_t *key);
@@ -511,7 +511,7 @@ trustdb_t* trustdb_readio(FILE *io);
 int trustdb_write(trustdb_t *ca, const char *path);
 int trustdb_writeio(trustdb_t *ca, FILE *io);
 
-void trustdb_destroy(trustdb_t *ca);
+void trustdb_free(trustdb_t *ca);
 
 int trustdb_trust(trustdb_t *ca, cert_t *key);
 int trustdb_revoke(trustdb_t *ca, cert_t *key);
