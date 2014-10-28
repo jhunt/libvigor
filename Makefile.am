@@ -109,8 +109,6 @@ EXTRA_DIST  = README COPYING
 EXTRA_DIST += bootstrap
 EXTRA_DIST += t/data
 
-EXTRA_CLEAN = docs
-
 test-data:
 	rm -f t/tmp/check-data-install.stamp
 	make t/tmp/check-data-install.stamp
@@ -134,6 +132,7 @@ manifest:
 
 test: check
 
+.PHONY: docs
 docs:
 	rm -fr docs
 	mkdir docs
