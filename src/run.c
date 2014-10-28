@@ -38,7 +38,7 @@ int run2(runner_t *ctx, char *cmd, ...)
 {
 	pid_t pid = fork();
 	if (pid < 0) {
-		ogger(LOG_ERR, "Failed to fork(): %s", strerror(errno));
+		logger(LOG_ERR, "Failed to fork(): %s", strerror(errno));
 		return -1;
 	}
 
@@ -56,17 +56,17 @@ int run2(runner_t *ctx, char *cmd, ...)
 	}
 
 	if (ctx && ctx->gid) {
-		ogger(LOG_DEBUG, "Setting GID to %u", ctx->gid);
+		logger(LOG_DEBUG, "Setting GID to %u", ctx->gid);
 		if (setgid(ctx->gid) != 0) {
-			ogger(LOG_ERR, "Failed to set effective GID to %u: %s",
+			logger(LOG_ERR, "Failed to set effective GID to %u: %s",
 					ctx->gid, strerror(errno));
 			exit(127);
 		}
 	}
 	if (ctx && ctx->uid) {
-		ogger(LOG_DEBUG, "Setting UID to %u", ctx->uid);
+		logger(LOG_DEBUG, "Setting UID to %u", ctx->uid);
 		if (setuid(ctx->uid) != 0) {
-			ogger(LOG_ERR, "Failed to set effective UID to %u: %s",
+			logger(LOG_ERR, "Failed to set effective UID to %u: %s",
 					ctx->uid, strerror(errno));
 			exit(127);
 		}
@@ -99,7 +99,7 @@ int run2(runner_t *ctx, char *cmd, ...)
 	}
 
 	execvp(cmd, args);
-	ogger(LOG_DEBUG, "run: execvp('%s') failed - %s",
+	logger(LOG_DEBUG, "run: execvp('%s') failed - %s",
 			cmd, strerror(errno));
 	exit(127);
 }
