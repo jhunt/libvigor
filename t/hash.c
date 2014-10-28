@@ -132,6 +132,7 @@ TESTS {
 			}
 		}
 		hash_done(h, 0);
+		free(h);
 
 		is_int(saw_promise, 1, "saw the promise key only once");
 		is_int(saw_snooze,  1, "saw the snooze key only once");
