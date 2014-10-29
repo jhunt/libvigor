@@ -601,6 +601,36 @@ int reactor_go(reactor_t *r);
 
 /*
 
+    ##     ##    ###
+    ##     ##   ## ##
+    ##     ##  ##   ##
+    ######### ##     ##
+    ##     ## #########
+    ##     ## ##     ##
+    ##     ## ##     ##
+
+ */
+
+typedef struct {
+	int    interval;
+	int    freshness;
+	double backoff;
+	int    max_delay;
+
+	/* state values */
+	int    delay;
+	int    missed;
+} bstar_t;
+
+int bstar_init(bstar_t*, int, int, double, int);
+int bstar_reset(bstar_t*);
+int bstar_miss(bstar_t*);
+int bstar_alive(bstar_t*);
+int bstar_delay(bstar_t*);
+int64_t bstar_expiry(bstar_t*);
+
+/*
+
     #######   ##     ## ##    ##
     ##    ##  ##     ## ###   ##
     ##    ##  ##     ## ####  ##

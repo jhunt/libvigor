@@ -16,6 +16,7 @@ core_src :=
 core_src += include/vigor.h
 core_src += src/impl.h
 core_src += src/basex.c
+core_src += src/bstar.c
 core_src += src/cache.c
 core_src += src/config.c
 core_src += src/cert.c
@@ -38,7 +39,7 @@ core_src += src/time.c
 
 lib_LTLIBRARIES = libvigor.la
 libvigor_la_SOURCES = $(core_src)
-libvigor_la_LDFLAGS = --version-info 1:0:0
+libvigor_la_LDFLAGS = --version-info 1:1:1
 
 include_HEADERS = include/vigor.h
 
