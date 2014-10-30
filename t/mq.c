@@ -182,4 +182,45 @@ TESTS {
 		vzmq_shutdown(server, 0);
 		zmq_ctx_destroy(z);
 	}
+
+	subtest { /* zap */
+		cert_t *server_cert = cert_generate(VIGOR_CERT_ENCRYPTION); assert(server_cert);
+		cert_t *client_cert = cert_generate(VIGOR_CERT_ENCRYPTION); assert(client_cert);
+		trustdb_t *tdb = trustdb_new();
+		ok(trustdb_trust(tdb, server_cert) == 0, "trusted new server cert");
+		ok(trustdb_trust(tdb, client_cert) == 0, "trusted new client cert");
+
+		void *z = zmq_ctx_new(); assert(z);
+		void *zap = zap_startup(z, tdb); assert(zap);
+		void *server = zmq_socket(z, ZMQ_ROUTER); assert(server);
+		void *client = zmq_socket(z, ZMQ_DEALER); assert(client);
+
+		int optval = 1;
+		ok(zmq_setsockopt(server, ZMQ_CURVE_SERVER, &optval, sizeof(optval)) == 0,
+			"Set ZMQ_CURVE_SERVER on the server socket");
+		diag(strerror(errno));
+		ok(zmq_setsockopt(server, ZMQ_CURVE_SECRETKEY, cert_secret(server_cert), 32) == 0,
+			"Set ZMQ_CURVE_SECRETKEY on the server socket");
+
+		ok(zmq_setsockopt(client, ZMQ_CURVE_SECRETKEY, cert_secret(client_cert), 32) == 0,
+			"Set ZMQ_CURVE_SECRETKEY on the client socket");
+		ok(zmq_setsockopt(client, ZMQ_CURVE_PUBLICKEY, cert_public(client_cert), 32) == 0,
+			"Set ZMQ_CURVE_PUBLICKEY on the client socket");
+		ok(zmq_setsockopt(client, ZMQ_CURVE_SERVERKEY, cert_public(server_cert), 32) == 0,
+			"Set ZMQ_CURVE_SERVERKEY on the client socket");
+
+		ok(zmq_bind(   server, "inproc://zap") == 0, "Bound the server socket");
+		ok(zmq_connect(client, "inproc://zap") == 0, "Connected the client socket");
+
+		pdu_t *pdu = pdu_make("PING", 0);
+		ok(pdu_send_and_free(pdu, client) == 0, "sent PDU");
+		pdu = pdu_recv(server);
+		isnt_null(pdu, "received PDU");
+		pdu_free(pdu);
+
+		vzmq_shutdown(client, 0);
+		vzmq_shutdown(server, 0);
+		zap_shutdown(zap);
+		zmq_ctx_destroy(z);
+	}
 }
