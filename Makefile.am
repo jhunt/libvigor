@@ -97,6 +97,10 @@ CTAP_TESTS += t/reactor
 t_reactor_SOURCES = t/reactor.c t/test.h
 t_reactor_LDFLAGS = libvigor.la
 
+CTAP_TESTS += t/run
+t_run_SOURCES = t/run.c t/test.h
+t_run_LDFLAGS = libvigor.la
+
 CTAP_TESTS += t/signals
 t_signals_SOURCES = t/signals.c t/test.h
 t_signals_LDFLAGS = libvigor.la

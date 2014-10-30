@@ -52,6 +52,7 @@ t/mq
 t/path
 t/proc
 t/reactor
+t/run
 t/signals
 t/strings
 t/time

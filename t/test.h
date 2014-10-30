@@ -29,7 +29,9 @@
 #include <sys/types.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 
+#include <unistd.h>
 #include <pthread.h>
 
 #ifndef TEST_DATA
