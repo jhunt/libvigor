@@ -19,7 +19,12 @@
 
 #include "test.h"
 
+#define LOOPBACK "tcp://127.0.0.1:1026"
+
 TESTS {
+	log_open("t/mq", "file:/dev/null");
+	log_level(LOG_EMERG, NULL);
+
 	char *s;
 
 	subtest { /* pdu instantiation */
@@ -186,19 +191,16 @@ TESTS {
 	subtest { /* zap */
 		cert_t *server_cert = cert_generate(VIGOR_CERT_ENCRYPTION); assert(server_cert);
 		cert_t *client_cert = cert_generate(VIGOR_CERT_ENCRYPTION); assert(client_cert);
-		trustdb_t *tdb = trustdb_new();
-		ok(trustdb_trust(tdb, server_cert) == 0, "trusted new server cert");
-		ok(trustdb_trust(tdb, client_cert) == 0, "trusted new client cert");
 
 		void *z = zmq_ctx_new(); assert(z);
-		void *zap = zap_startup(z, tdb); assert(zap);
+		void *zap = zap_startup(z, NULL); assert(zap);
+
 		void *server = zmq_socket(z, ZMQ_ROUTER); assert(server);
 		void *client = zmq_socket(z, ZMQ_DEALER); assert(client);
 
 		int optval = 1;
 		ok(zmq_setsockopt(server, ZMQ_CURVE_SERVER, &optval, sizeof(optval)) == 0,
 			"Set ZMQ_CURVE_SERVER on the server socket");
-		diag(strerror(errno));
 		ok(zmq_setsockopt(server, ZMQ_CURVE_SECRETKEY, cert_secret(server_cert), 32) == 0,
 			"Set ZMQ_CURVE_SECRETKEY on the server socket");
 
@@ -209,8 +211,11 @@ TESTS {
 		ok(zmq_setsockopt(client, ZMQ_CURVE_SERVERKEY, cert_public(server_cert), 32) == 0,
 			"Set ZMQ_CURVE_SERVERKEY on the client socket");
 
-		ok(zmq_bind(   server, "inproc://zap") == 0, "Bound the server socket");
-		ok(zmq_connect(client, "inproc://zap") == 0, "Connected the client socket");
+		cert_free(server_cert);
+		cert_free(client_cert);
+
+		ok(zmq_bind(   server, LOOPBACK) == 0, "Bound the server socket");
+		ok(zmq_connect(client, LOOPBACK) == 0, "Connected the client socket");
 
 		pdu_t *pdu = pdu_make("PING", 0);
 		ok(pdu_send_and_free(pdu, client) == 0, "sent PDU");
@@ -223,4 +228,49 @@ TESTS {
 		zap_shutdown(zap);
 		zmq_ctx_destroy(z);
 	}
+
+	subtest { /* zap - bad certs */
+		char *badcert_x[32],
+		     *badcert_y[32],
+		     *badcert_z[32];
+		memset(badcert_x, 'x', 32);
+		memset(badcert_y, 'y', 32);
+		memset(badcert_z, 'z', 32);
+
+		void *z = zmq_ctx_new(); assert(z);
+		void *zap = zap_startup(z, NULL); assert(zap);
+
+		void *server = zmq_socket(z, ZMQ_ROUTER); assert(server);
+		void *client = zmq_socket(z, ZMQ_DEALER); assert(client);
+
+		int optval = 1;
+		ok(zmq_setsockopt(server, ZMQ_CURVE_SERVER, &optval, sizeof(optval)) == 0,
+			"Set ZMQ_CURVE_SERVER on the server socket");
+		ok(zmq_setsockopt(server, ZMQ_CURVE_SECRETKEY, badcert_z, 32) == 0,
+			"Set ZMQ_CURVE_SECRETKEY on the server socket");
+
+		ok(zmq_setsockopt(client, ZMQ_CURVE_SECRETKEY, badcert_x, 32) == 0,
+			"Set ZMQ_CURVE_SECRETKEY on the client socket");
+		ok(zmq_setsockopt(client, ZMQ_CURVE_PUBLICKEY, badcert_y, 32) == 0,
+			"Set ZMQ_CURVE_PUBLICKEY on the client socket");
+		ok(zmq_setsockopt(client, ZMQ_CURVE_SERVERKEY, badcert_z, 32) == 0,
+			"Set ZMQ_CURVE_SERVERKEY on the client socket");
+
+		ok(zmq_bind(   server, LOOPBACK) == 0, "Bound the server socket");
+		ok(zmq_connect(client, LOOPBACK) == 0, "Connected the client socket");
+
+		ok(pdu_send_and_free(pdu_make("PING?", 0), client) == 0, "sent PDU");
+
+		/* now we have to use a poller, since we should never get a response */
+		diag("waiting up to 2s for a response");
+		zmq_pollitem_t poll[1] = { { server, 0, ZMQ_POLLIN, 0 } };
+		is_int(zmq_poll(poll, 1, 2000), 0, "no response in 2s of waiting");
+
+		vzmq_shutdown(client, 0);
+		vzmq_shutdown(server, 0);
+		zap_shutdown(zap);
+		zmq_ctx_destroy(z);
+	}
+
+	log_close();
 }

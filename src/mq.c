@@ -442,7 +442,7 @@ static int s_zap_send(void *socket, const char *s) {
 static int s_zap_sendmore(void *socket, const char *s) {
 	return zmq_send(socket, s, strlen(s), ZMQ_SNDMORE);
 }
-static void* szap_thread(void *u)
+static void* s_zap_thread(void *u)
 {
 	assert(u);
 	zap_t *zap = (zap_t*)u;
@@ -533,7 +533,7 @@ void* zap_startup(void *zctx, trustdb_t *tdb)
 	int rc = zmq_bind(handle->socket, "inproc://zeromq.zap.01");
 	assert(rc == 0);
 
-	rc = pthread_create(&handle->tid, NULL, szap_thread, handle);
+	rc = pthread_create(&handle->tid, NULL, s_zap_thread, handle);
 	assert(rc == 0);
 
 	return handle;
