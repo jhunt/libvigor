@@ -229,6 +229,9 @@ void* cache_get(cache_t *cc, const char *id)
 void* cache_set(cache_t *cc, const char *id, void *data)
 {
 	cache_entry_t *ent = hash_get(&cc->index, id);
+	if (ent && ent->data != data && cc->destroy_f)
+		(*cc->destroy_f)(ent->data);
+
 	if (!ent) {
 		int idx = s_cache_next(cc);
 		if (idx < 0) return NULL;
@@ -239,7 +242,6 @@ void* cache_set(cache_t *cc, const char *id, void *data)
 		hash_set(&cc->index, id, ent);
 	}
 	ent->last_seen = time_s();
-	/* FIXME: I sense a memory leak... */
 	return ent->data = data;
 }
 
