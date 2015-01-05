@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <sys/time.h>
 #include <syslog.h> /* so callers get LOG_* constants */
 #include <zmq.h>
