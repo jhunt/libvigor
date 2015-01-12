@@ -224,7 +224,7 @@ cache_t* cache_new(size_t max, int32_t expire);
 void cache_free(cache_t *cc);
 void cache_purge(cache_t *cc, int force);
 int cache_resize(cache_t **cc, size_t max);
-int   cache_setopt(cache_t *cc, int op, void *value);
+int   cache_setopt(cache_t *cc, int op, const void *value);
 void* cache_get(cache_t *cc, const char *id);
 void* cache_set(cache_t *cc, const char *id, void *data);
 void* cache_unset(cache_t *cc, const char *id);

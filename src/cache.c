@@ -170,7 +170,7 @@ void cache_purge(cache_t *cc, int force)
 
   - **`EINVAL`** - An unknown or unhandled $op value was specified.
  */
-int cache_setopt(cache_t *cc, int op, void *data)
+int cache_setopt(cache_t *cc, int op, const void *data)
 {
 	if (op == VIGOR_CACHE_DESTRUCTOR) {
 		cc->destroy_f = data;
