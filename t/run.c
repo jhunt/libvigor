@@ -34,6 +34,12 @@ TESTS {
 	}
 
 	subtest { /* io pipes */
+		mkdir("t/tmp", 0777);
+		FILE *bin = fopen("t/tmp/calc", "w");
+		if (!bin) BAIL_OUT("unable to create t/tmp/calc script!");
+		fprintf(bin, "#/bin/bash\nread A; read B\necho $(expr $A \\* $B)\n");
+		fchmod(fileno(bin), 0777);
+		fclose(bin);
 
 		runner_t runner = {
 			.in  = tmpfile(),
@@ -42,16 +48,16 @@ TESTS {
 			.uid = 0,
 			.gid = 0,
 		};
-		fprintf(runner.in, "6 9 * p\n");
+		fprintf(runner.in, "6\n9\n");
 		rewind(runner.in);
 
-		is_int(run2(&runner, "dc", NULL), 0,
-			"Ran desk calculator (dc) utility");
+		is_int(run2(&runner, "t/tmp/calc", NULL), 0,
+			"Ran desk calculator (t/tmp/calc) utility");
 
 		rewind(runner.out);
 		char buf[8192];
 		isnt_null(fgets(buf, 8191, runner.out), "Read line 1 of output");
-		is_string(buf, "54\n", "dc output (line 1)");
+		is_string(buf, "54\n", "t/tmp/calc output (line 1)");
 
 		rewind(runner.err);
 		is_null(fgets(buf, 8191, runner.err), "no stderr");
