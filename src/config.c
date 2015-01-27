@@ -144,20 +144,22 @@ int config_read(config_t *cfg, FILE *io)
 	while (fgets(line, 8191, io)) {
 		/* FIXME: doesn't handle large lines (>8192) */
 		/*
-		   "   directive    value  \n"
-		    ^  ^        ^   ^    ^
-		    |  |        |   |    |
-		    |  |        |   |    `--- d (= '\0')
-		    |  |        |   `-------- c
-		    |  |        `------------ b (= '\0')
-		    |  `--------------------- a
-		    `------------------------ line
+		   "   directive    value here  \n"
+		    ^  ^        ^   ^         ^
+		    |  |        |   |         |
+		    |  |        |   |         `--- d (= '\0')
+		    |  |        |   `------------- c
+		    |  |        `----------------- b (= '\0')
+		    |  `-------------------------- a
+		    `----------------------------- line
 		 */
 		char *a, *b, *c, *d;
 		for (a = line; *a &&  isspace(*a); a++);
 		for (b = a;    *b && !isspace(*b); b++);
 		for (c = b;    *c &&  isspace(*c); c++);
-		for (d = c;    *d && !isspace(*d); d++);
+
+		for (d = c; *d; d++); for (; !*d || isspace(*d); d--);
+		if (*d) d++;
 		*b = *d = '\0';
 
 		if (!*a) continue;

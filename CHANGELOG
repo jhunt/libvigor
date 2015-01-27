@@ -1,0 +1,7 @@
+
+1.1.2        2014-01-26
+
+  [BUG FIXES]
+
+  - Support multi-token config values, for lines like:
+    "sys.command    /bin/path/to/command --options"

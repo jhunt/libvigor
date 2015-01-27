@@ -65,6 +65,7 @@ TESTS {
 		fprintf(io, "path default\n");
 		fprintf(io, "   \n");
 		fprintf(io, "\tport 5155   \n");
+		fprintf(io, "a b c d e  \n");
 		fprintf(io, "#eof\n");
 
 		rewind(io);
@@ -72,6 +73,7 @@ TESTS {
 
 		is_string(config_get(&c, "path"), "default", "config[path]");
 		is_string(config_get(&c, "port"), "5155",    "config[port]");
+		is_string(config_get(&c, "a"),    "b c d e", "config[a]");
 		is_string(config_get(&c, "foo"),  "bar",     "config[foo] is still set");
 		is_null(  config_get(&c, "debug"),           "config[debug] is not set");
 
