@@ -288,3 +288,21 @@ void cache_touch(cache_t *cc, const char *id, int32_t last)
 	if (last <= 0) last = time_s();
 	ent->last_seen = last;
 }
+
+int cache_isfull(cache_t *cc)
+{
+	int i;
+	for (i = 0; i < cc->max_len; i++)
+		if (!cc->entries[i].ident)
+			return 0;
+	return 1;
+}
+
+int cache_isempty(cache_t *cc)
+{
+	int i;
+	for (i = 0; i < cc->max_len; i++)
+		if (cc->entries[i].ident)
+			return 0;
+	return 1;
+}

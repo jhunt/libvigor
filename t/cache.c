@@ -161,5 +161,21 @@ TESTS {
 		cache_free(cc);
 	}
 
+	subtest { /* full vs. empty */
+		cache_t *cc = cache_new(2, 1);
+		ok( cache_isempty(cc), "new cache isempty()");
+		ok(!cache_isfull(cc), "new cache !isfull()");
+
+		isnt_null(cache_set(cc, "key1", (void*)1), "key1 inserted");
+		ok(!cache_isempty(cc), "half-full cache !isempty()");
+		ok(!cache_isfull(cc), "half-full cache !isfull()");
+
+		isnt_null(cache_set(cc, "key2", (void*)2), "key2 inserted");
+		ok(!cache_isempty(cc), "full cache !isempty()");
+		ok( cache_isfull(cc), "full cache !isfull()");
+
+		cache_free(cc);
+	}
+
 	done_testing();
 }

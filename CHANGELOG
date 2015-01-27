@@ -2,6 +2,13 @@
 1.1.3        2014-01-27
 (1:3:2)
 
+  [ENHANCEMENTS]
+  - New cache_isempty()  / cache_isfull() interface for querying
+    if a cache is empty or full (respectively)
+
+  - The 'len' parameter of cache_t was not used, and has been removed
+    (replaced with a dummy member that will be ignored)
+
   [BUG FIXES]
   - Strip out comments when parsing configurations
     (pseudo-regression introduced in 1.1.2)
@@ -14,3 +21,9 @@
 
   - Support multi-token config values, for lines like:
     "sys.command    /bin/path/to/command --options"
+
+
+1.1.1        2014-01-12
+(1:2:2)
+
+  started tracking changes in CHANGELOG

@@ -203,7 +203,7 @@ typedef struct {
 } cache_entry_t;
 
 typedef struct {
-	size_t  len;
+	size_t  __reserved1__;
 	size_t  max_len;
 	int32_t expire;
 
@@ -229,6 +229,8 @@ void* cache_get(cache_t *cc, const char *id);
 void* cache_set(cache_t *cc, const char *id, void *data);
 void* cache_unset(cache_t *cc, const char *id);
 void cache_touch(cache_t *cc, const char *id, int32_t last);
+int cache_isfull(cache_t *cc);
+int cache_isempty(cache_t *cc);
 
 /*
      ######  ######## ########  #### ##    ##  ######    ######
