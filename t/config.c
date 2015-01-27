@@ -93,4 +93,20 @@ TESTS {
 		is_string(config_get(&c, "foo"),   "bar", "config[foo] is still set");
 		config_done(&c);
 	}
+
+	subtest { /* comments */
+		CONFIG(c);
+
+		FILE *io = tmpfile();
+		fprintf(io, "# this is a comment\n");
+		fprintf(io, "a default          # trailing comment\n");
+		fprintf(io, "b 4 8 15 16 23 42  # trailing comment\n");
+
+		rewind(io);
+		is_int(config_read(&c, io), 0, "read from tmpfile");
+
+		is_string(config_get(&c, "a"), "default",         "config[a]");
+		is_string(config_get(&c, "b"), "4 8 15 16 23 42", "config[b]");
+		config_done(&c);
+	}
 }
