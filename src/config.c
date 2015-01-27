@@ -158,7 +158,7 @@ int config_read(config_t *cfg, FILE *io)
 		for (b = a;    *b && !isspace(*b); b++);
 		for (c = b;    *c &&  isspace(*c); c++);
 
-		for (d = c; *d; d++); for (; !*d || isspace(*d); d--);
+		for (d = c; *d; d++); for (; d > c && (!*d || isspace(*d)); d--);
 		if (*d) d++;
 		*b = *d = '\0';
 
