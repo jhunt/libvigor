@@ -1,3 +1,12 @@
+1.2.0        2014-02-06
+(1:4:3)
+
+  [ENHANCEMENTS]
+  - New ha_* implementation
+    Implements the Binary Star HA pattern, from the ZeroMQ
+    project.  Replaces the existing bstar_* functions / typedefs.
+
+
 
 1.1.3        2014-01-27
 (1:3:2)
@@ -14,6 +23,7 @@
     (pseudo-regression introduced in 1.1.2)
 
 
+
 1.1.2        2014-01-26
 (1:2:2)
 
@@ -21,6 +31,7 @@
 
   - Support multi-token config values, for lines like:
     "sys.command    /bin/path/to/command --options"
+
 
 
 1.1.1        2014-01-12
