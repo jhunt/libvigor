@@ -11,7 +11,7 @@ Build-Depends: debhelper (>= 8.0.0),
                libtool,
                libzmq3-dev
 
-Package: libvigor0
+Package: libvigor1
 Architecture: any
 Depends: libsodium13, libzmq3, ${misc:Depends}, ${shlibs:Depends}
 Description: Missing Bits of C
@@ -32,11 +32,11 @@ Description: Missing Bits of C - development tools
  .
  This package contains the header files for developing code against libvigor.
 
-Package: libvigor0-dbg
+Package: libvigor1-dbg
 Architecture: any
 Priority: extra
 Section: debug
-Depends: libvigor0 (= ${binary:Version}), ${misc:Depends}
+Depends: libvigor1 (= ${binary:Version}), ${misc:Depends}
 Description: Missing Bits of C
  libvigor is a set of primitives for getting past the inherent shortcomings
  of a beautifully simple language like C.  It provides robust list and hash
