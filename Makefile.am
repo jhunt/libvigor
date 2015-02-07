@@ -22,6 +22,7 @@ core_src += src/config.c
 core_src += src/cert.c
 core_src += src/daemon.c
 core_src += src/fqdn.c
+core_src += src/ha.c
 core_src += src/hash.c
 core_src += src/list.c
 core_src += src/lock.c
@@ -60,6 +61,10 @@ t_cert_LDFLAGS = libvigor.la
 CTAP_TESTS += t/config
 t_config_SOURCES = t/config.c t/test.h
 t_config_LDFLAGS = libvigor.la
+
+CTAP_TESTS += t/ha
+t_ha_SOURCES = t/ha.c t/test.h
+t_ha_LDFLAGS = libvigor.la
 
 CTAP_TESTS += t/hash
 t_hash_SOURCES = t/hash.c t/test.h

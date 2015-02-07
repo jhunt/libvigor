@@ -43,6 +43,7 @@ t/basex
 t/config
 t/cache
 t/cert
+t/ha
 t/hash
 t/list
 t/lock
