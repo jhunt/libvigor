@@ -39,7 +39,7 @@ core_src += src/time.c
 
 lib_LTLIBRARIES = libvigor.la
 libvigor_la_SOURCES = $(core_src)
-libvigor_la_LDFLAGS = --version-info 1:4:3
+libvigor_la_LDFLAGS = -version-info 1:0:0
 
 include_HEADERS = include/vigor.h
 
