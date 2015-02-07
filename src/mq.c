@@ -178,10 +178,8 @@ void vzmq_shutdown(void *zocket, int linger)
 	if (rc != 0)
 		logger(LOG_ERR, "failed to set ZMQ_LINGER to %i on socket %p: %s",
 			linger, zocket, zmq_strerror(errno));
-	assert(rc == 0);
 
-	rc = zmq_close(zocket);
-	assert(rc == 0);
+	zmq_close(zocket);
 }
 
 pdu_t* pdu_new(void)
@@ -549,14 +547,6 @@ void zap_shutdown(void *handle)
 	void *_;
 	pthread_join(z->tid, &_);
 
-	int linger = 400;
-	int rc = zmq_setsockopt(z->socket, ZMQ_LINGER, &linger, sizeof(linger));
-	if (rc != 0)
-		logger(LOG_ERR, "faild to set ZMQ_LINGER to 400ms on socket %p: %s",
-			z->socket, zmq_strerror(errno));
-
-	rc = zmq_close(z->socket);
-	assert(rc == 0);
-
+	vzmq_shutdown(z->socket, 400);
 	free(z);
 }
