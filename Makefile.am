@@ -164,6 +164,7 @@ clean-gcov-files:
 	@rm -fr coverage
 	@find . -name "*.gcda" -o -name "*.gcno" -exec rm {} \;
 
+.PHONY: coverage
 if GCOV_ENABLED
 coverage-clean:
 	@lcov --directory . --zerocounters
