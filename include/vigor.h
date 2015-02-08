@@ -657,6 +657,37 @@ void ha_shutdown(void *handle);
 
 /*
 
+    ##     ## ########
+    ##     ## ##     ##
+    ##     ## ##     ##
+    ######### ########
+    ##     ## ##     ##
+    ##     ## ##     ##
+    ##     ## ########
+
+ */
+
+typedef struct {
+	int    interval;
+	int    freshness;
+	double backoff;
+	int    max_delay;
+
+	int    expiry;
+
+	/* state values */
+	int    delay;
+	int    missed;
+} hb_t;
+
+int hb_init(hb_t*, int, int, double, int);
+int hb_ping(hb_t*);
+int hb_miss(hb_t*);
+int hb_alive(hb_t*);
+void hb_sleep(hb_t*);
+
+/*
+
     #######   ##     ## ##    ##
     ##    ##  ##     ## ###   ##
     ##    ##  ##     ## ####  ##
