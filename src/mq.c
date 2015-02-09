@@ -425,6 +425,38 @@ void pdu_fprint(pdu_t *p, FILE *io)
 	fprintf(io, "END\n");
 }
 
+int pdu_to_hash(pdu_t *p, hash_t *h, int offset)
+{
+	assert(p);
+	assert(h);
+
+	if ((pdu_size(p) - offset) % 2 != 0)
+		return 1;
+
+	int i;
+	for (i = offset; i < pdu_size(p); i += 2) {
+		char *k = pdu_string(p, i);
+		char *v = pdu_string(p, i + 1);
+
+		hash_set(h, k, v);
+		free(k);
+	}
+	return 0;
+}
+
+int pdu_from_hash(pdu_t *p, hash_t *h)
+{
+	assert(p);
+	assert(h);
+
+	char *k, *v;
+	for_each_key_value(h, k, v) {
+		pdu_extend(p, k, strlen(k));
+		pdu_extend(p, v, strlen(v));
+	}
+	return 0;
+}
+
 static char *s_zap_recv(void *socket)
 {
 	char buf[256];

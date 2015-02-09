@@ -155,6 +155,55 @@ TESTS {
 		pdu_free(client_rep);
 	}
 
+	subtest { /* pdu_to_hash */
+		pdu_t *pdu;
+		hash_t hash;
+		memset(&hash, 0, sizeof(hash));
+
+		pdu = pdu_make("SIMPLE", 6,
+			"key1", "value1",
+			"key2", "second value",
+			"KeY3", "value III");
+
+		ok(pdu_to_hash(pdu, &hash, 2) != 0,
+			"failed to create hash from bad PDU (offset)");
+
+		is_null(hash_get(&hash, "key1"), "key1 not set");
+		is_null(hash_get(&hash, "key2"), "key2 not set");
+		is_null(hash_get(&hash, "KeY3"), "KeY3 not set");
+
+		ok(pdu_to_hash(pdu, &hash, 1) == 0, "created hash from PDU");
+		is(hash_get(&hash, "key1"), "value1",       "key1 set");
+		is(hash_get(&hash, "key2"), "second value", "key2 set");
+		is(hash_get(&hash, "KeY3"), "value III",    "KeY3 set");
+
+		pdu_free(pdu);
+		hash_done(&hash, 1);
+	}
+
+	subtest { /* hash_to_pdu */
+		pdu_t *pdu;
+		hash_t hash;
+		memset(&hash, 0, sizeof(hash));
+
+		pdu = pdu_make("SIMPLE", 3, "extra", "header", "fields");
+		hash_set(&hash, "uuid", "DEADBEEF");
+		hash_set(&hash, "type", "worker");
+
+		ok(pdu_from_hash(pdu, &hash) == 0, "extended PDU from hash");
+		char *s;
+		is(s = pdu_string(pdu, 1), "extra",    "PDU[1] == 'extra'");    free(s);
+		is(s = pdu_string(pdu, 2), "header",   "PDU[2] == 'header'");   free(s);
+		is(s = pdu_string(pdu, 3), "fields",   "PDU[3] == 'fields'");   free(s);
+		is(s = pdu_string(pdu, 4), "uuid",     "PDU[4] == 'uuid'");     free(s);
+		is(s = pdu_string(pdu, 5), "DEADBEEF", "PDU[5] == 'DEADBEEF'"); free(s);
+		is(s = pdu_string(pdu, 6), "type",     "PDU[6] == 'type'");     free(s);
+		is(s = pdu_string(pdu, 7), "worker",   "PDU[7] == 'worker'");   free(s);
+
+		pdu_free(pdu);
+		hash_done(&hash, 0);
+	}
+
 	subtest { /* vzmq_ident */
 		uint8_t client_id[8] = { 0xde, 0xad, 0xbe, 0xef,     0xde, 0xca, 0xfb, 0xad };
 		void *z = zmq_ctx_new(); assert(z);

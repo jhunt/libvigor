@@ -574,6 +574,9 @@ pdu_t* pdu_recv(void *zocket);
 void pdu_fprint(pdu_t *p, FILE *io);
 #define pdu_print(p) pdu_fprint((p), stderr)
 
+int pdu_to_hash(pdu_t *p, hash_t *h, int offset);
+int pdu_from_hash(pdu_t *p, hash_t *h);
+
 void *zap_startup(void *zctx, trustdb_t *tdb);
 void zap_shutdown(void *handle);
 

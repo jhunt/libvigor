@@ -1,3 +1,12 @@
+master
+(1:0:0)
+
+  [ENHANCEMENTS]
+  - Hash-based PDU serialization / de-serialization
+    pdu_t + hash_t = awesomeness for extensible protocols!
+
+
+
 1.2.0        2014-02-06
 (1:0:0)
 
