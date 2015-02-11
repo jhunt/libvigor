@@ -33,6 +33,39 @@ TESTS {
 			TEST_TMP "/touched exists after run() call");
 	}
 
+	subtest { /* UID / GID tests */
+		if (geteuid() != 0) {
+			diag("skipping UID/GID tests");
+
+		} else {
+			mkdir("t/tmp", 0777);
+			FILE *bin = fopen("t/tmp/ids", "w");
+			if (!bin) BAIL_OUT("unable to create t/tmp/ids script!");
+			fprintf(bin, "#!/usr/bin/perl\n$g=$);$g=~s/ .*//;\nprint $>,':',$g,$/;\n");
+			fchmod(fileno(bin), 0777);
+			fclose(bin);
+
+			char buf[8192];
+			runner_t runner = {
+				.in  = NULL,
+				.out = tmpfile(),
+				.err = tmpfile(),
+				.uid = 12345,
+				.gid = 40404,
+			};
+
+			is_int(run2(&runner, "t/tmp/ids", NULL), 0,
+				"Ran ID (t/tmp/ids) utility with valid IDs");
+			rewind(runner.out);
+			isnt_null(fgets(buf, 8191, runner.out), "Read line 1 of output");
+			is_string(buf, "12345:40404\n", "t/tmp/ids output (line 1)");
+
+			rewind(runner.err);
+			is_null(fgets(buf, 8191, runner.err), "no stderr");
+			ok(feof(runner.err), "stderr EOF");
+		}
+	}
+
 	subtest { /* io pipes */
 		mkdir("t/tmp", 0777);
 		FILE *bin = fopen("t/tmp/calc", "w");
