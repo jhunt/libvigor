@@ -141,6 +141,10 @@ t/tmp/check-data-install.stamp:
 	find t/tmp -type d ! -perm -200 -exec chmod u+w {} ';'
 	touch $@
 
+bin_PROGRAMS = fuzz-config
+fuzz_config_SOURCES = fuzz/config.c include/vigor.h
+fuzz_config_LDFLAGS = libvigor.la
+
 ############################################################
 
 version:
