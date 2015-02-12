@@ -1,9 +1,24 @@
 master
 (1:0:0)
 
+  (none yet)
+
+
+
+1.2.1        2014-02-11
+(1:0:0)
+
   [ENHANCEMENTS]
   - Hash-based PDU serialization / de-serialization
     pdu_t + hash_t = awesomeness for extensible protocols!
+
+  - Heartbeat implementation
+    hb_t structure and hb_*() functions can be used to implement
+    time-based delays with a backoff algorithm.
+
+  - New tests for run2() UID / GID handling
+    Ensure that we are honoring the UID / GID specifications
+    given in runner_t.  Must run the tests as root to test.
 
 
 
