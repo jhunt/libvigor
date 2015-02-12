@@ -23,6 +23,7 @@
 #define EMPTY_B16_KEY "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
 TESTS {
+	alarm(5);
 	subtest { /* failure on instantiation */
 		is_null(cert_new(42), "Fail to create a non-ENCRPYTION, non-SIGNING cert");
 	}
@@ -558,5 +559,6 @@ TESTS {
 		cert_free(key);
 	}
 
+	alarm(0);
 	done_testing();
 }

@@ -20,6 +20,7 @@
 #include "test.h"
 
 TESTS {
+	alarm(5);
 	subtest {
 		struct stat st;
 		unlink(TEST_TMP "/touched");
@@ -96,4 +97,7 @@ TESTS {
 		is_null(fgets(buf, 8191, runner.err), "no stderr");
 		ok(feof(runner.err), "stderr EOF");
 	}
+
+	alarm(0);
+	done_testing();
 }

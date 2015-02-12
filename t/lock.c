@@ -20,6 +20,7 @@
 #include "test.h"
 
 TESTS {
+	alarm(5);
 	subtest {
 		lock_t L;
 		lock_init(&L, TEST_TMP "/test.lock");
@@ -39,4 +40,7 @@ TESTS {
 
 		ok(lock_acquire(&L2, 0) == 0, "Acquired newly-released lock");
 	}
+
+	alarm(0);
+	done_testing();
 }

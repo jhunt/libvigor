@@ -20,6 +20,7 @@
 #include "test.h"
 
 TESTS {
+	alarm(5);
 	subtest {
 		proc_t ps;
 		is_int(proc_stat(getpid(), &ps), 0, "Got process status");
@@ -42,4 +43,7 @@ TESTS {
 		is_int(proc_stat(child, &ps), -1,
 			"Failed to get process status for a dead process");
 	}
+
+	alarm(0);
+	done_testing();
 }

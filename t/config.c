@@ -20,6 +20,7 @@
 #include "test.h"
 
 TESTS {
+	alarm(5);
 	subtest {
 		CONFIG(c);
 
@@ -109,4 +110,7 @@ TESTS {
 		is_string(config_get(&c, "b"), "4 8 15 16 23 42", "config[b]");
 		config_done(&c);
 	}
+
+	alarm(0);
+	done_testing();
 }

@@ -20,6 +20,7 @@
 #include "test.h"
 
 TESTS {
+	alarm(5);
 	subtest {
 		char     ascii[256];
 		uint8_t  binary[128];
@@ -126,5 +127,6 @@ TESTS {
 		is_int(errno, EILSEQ, "errno set to EILSEQ on invalid encoded character");
 	}
 
+	alarm(0);
 	done_testing();
 }

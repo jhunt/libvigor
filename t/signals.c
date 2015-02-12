@@ -20,6 +20,8 @@
 #include "test.h"
 
 TESTS {
+	alarm(5);
+
 	subtest {
 		pid_t pid = fork();
 		if (pid < 0)
@@ -36,4 +38,7 @@ TESTS {
 		ok(signalled(), "signalled during our 60s nap");
 		ok(!signalled(), "not signalled anymore");
 	}
+
+	alarm(0);
+	done_testing();
 }

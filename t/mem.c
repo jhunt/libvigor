@@ -20,6 +20,7 @@
 #include "test.h"
 
 TESTS {
+	alarm(5);
 	subtest {
 		char  val[12] = {0};
 		char *buf = vmalloc(12);
@@ -55,4 +56,7 @@ TESTS {
 			exit(0);
 		}
 	}
+
+	alarm(0);
+	done_testing();
 }

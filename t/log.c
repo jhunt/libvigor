@@ -45,6 +45,7 @@ void restore(FILE *io)
 #define WRAPPED_IO(io) for (io = redirect(); OLD_FD >= 0; restore(io))
 
 TESTS {
+	alarm(5);
 	pid_t pid = getpid();
 	FILE *io;
 
@@ -148,4 +149,6 @@ TESTS {
 	}
 
 	log_close();
+	alarm(0);
+	done_testing();
 }

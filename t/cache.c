@@ -26,6 +26,7 @@ void destroyer(void *d)
 }
 
 TESTS {
+	alarm(5);
 	subtest { /* basic types */
 		cache_t *cc = cache_new(4, 20);
 		isnt_null(cc, "cache_new created a new cache");
@@ -177,5 +178,6 @@ TESTS {
 		cache_free(cc);
 	}
 
+	alarm(0);
 	done_testing();
 }

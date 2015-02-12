@@ -20,6 +20,7 @@
 #include "test.h"
 
 TESTS {
+	alarm(5);
 	subtest {
 		hash_t *h;
 		char *path = strdup("/some/path/some/where");
@@ -166,5 +167,6 @@ TESTS {
 		hash_done(&b, 0);
 	}
 
+	alarm(0);
 	done_testing();
 }

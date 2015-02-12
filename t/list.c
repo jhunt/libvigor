@@ -60,6 +60,7 @@ static int sum(list_t *l)
 /*************************************************************************/
 
 TESTS {
+	alarm(5);
 	subtest {
 		NUMBER(n1, 4);
 		NUMBER(n2, 8);
@@ -189,5 +190,6 @@ TESTS {
 		free(n1); free(n2); free(n3); free(n4);
 	};
 
+	alarm(0);
 	done_testing();
 }

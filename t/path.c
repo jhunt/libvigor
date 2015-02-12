@@ -29,6 +29,7 @@ static void is_canonical(const char *orig_path, const char *expected)
 }
 
 TESTS {
+	alarm(5);
 	subtest {
 		path_t *p = NULL;
 		path_free(p);
@@ -111,5 +112,6 @@ TESTS {
 		path_free(p);
 	}
 
+	alarm(0);
 	done_testing();
 }

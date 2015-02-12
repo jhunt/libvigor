@@ -48,6 +48,7 @@ static int64_t EXPIRY = 0;
 } while (0)
 
 TESTS {
+	alarm(5);
 	void *ZMQ = zmq_ctx_new();
 
 	subtest { /* basic HA FSM instantiation */
@@ -178,5 +179,6 @@ TESTS {
 	}
 
 	zmq_ctx_destroy(ZMQ);
+	alarm(0);
 	done_testing();
 }

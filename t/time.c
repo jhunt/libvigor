@@ -20,6 +20,7 @@
 #include "test.h"
 
 TESTS {
+	alarm(5);
 	setenv("TZ", "UTC", 1);
 
 	subtest {
@@ -60,4 +61,7 @@ TESTS {
 			"[[Fri, Feb 13 2009 at 23:31:30pm]]",
 			"time formatting works");
 	}
+
+	alarm(0);
+	done_testing();
 }

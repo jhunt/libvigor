@@ -20,6 +20,7 @@
 #include "test.h"
 
 TESTS {
+	alarm(5);
 	subtest { /* basic instantiation */
 		hb_t heartbeat; memset(&heartbeat, 0x42, sizeof(heartbeat));
 		ok(hb_init(&heartbeat, 1000, 4, 1.5, 2000), "Initialized a heartbeat structure");
@@ -94,5 +95,6 @@ TESTS {
 		ok(t1 - t0 >= 100, "at least 100ms pass during hb_sleep()");
 	}
 
+	alarm(0);
 	done_testing();
 }

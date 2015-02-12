@@ -22,6 +22,7 @@
 #define LOOPBACK "tcp://127.0.0.1:1026"
 
 TESTS {
+	alarm(5);
 	log_open("t/mq", "file:/dev/null");
 	log_level(LOG_EMERG, NULL);
 
@@ -322,4 +323,6 @@ TESTS {
 	}
 
 	log_close();
+	alarm(0);
+	done_testing();
 }

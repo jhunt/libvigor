@@ -118,6 +118,7 @@ void *server2_thread(void *Z)
 }
 
 TESTS {
+	alarm(5);
 	void *Z = zmq_ctx_new();
 	char *s;
 
@@ -220,5 +221,6 @@ TESTS {
 	}
 
 	zmq_ctx_destroy(Z);
+	alarm(0);
 	done_testing();
 }

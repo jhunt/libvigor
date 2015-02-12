@@ -20,6 +20,7 @@
 #include "test.h"
 
 TESTS {
+	alarm(5);
 	subtest {
 		hash_t *vars;
 
@@ -535,5 +536,6 @@ TESTS {
 		free(s);
 	}
 
+	alarm(0);
 	done_testing();
 }
