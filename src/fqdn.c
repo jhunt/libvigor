@@ -53,7 +53,7 @@ char* fqdn(void)
 	gethostname(nodename, 1023);
 
 	struct addrinfo hints, *info, *p;
-	memset(&hints, 0, sizeof hints);
+	memset(&hints, 0, sizeof(hints));
 	hints.ai_family   = AF_UNSPEC; /*either IPV4 or IPV6*/
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags    = AI_CANONNAME;

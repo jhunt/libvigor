@@ -1,7 +1,9 @@
 master
 (1:0:0)
 
-  (none yet)
+  [ENHANCEMENTS]
+  - New vzmq_resolve(char *endpoint, int af) function, for DNS
+    resolution of 0MQ/TCP endpoints.
 
 
 

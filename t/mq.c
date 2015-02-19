@@ -322,6 +322,51 @@ TESTS {
 		zmq_ctx_destroy(z);
 	}
 
+	subtest { /* endpoint resolution */
+		strings_t *res;
+		const char *e;
+
+		e = "inproc://leave.it.alone";
+		res = vzmq_resolve(e, AF_UNSPEC);
+		isnt_null(res, "resolved %s to a list of endpoints", e);
+		is_int(res->num, 1, "%s -> 1 result", e);
+		is(res->strings[0], e, "%s resolves to itself", e);
+		strings_free(res);
+
+		e = "tcp://1.2.3.4:5678";
+		res = vzmq_resolve(e, AF_UNSPEC);
+		isnt_null(res, "resolved %s to a list of endpoints", e);
+		is_int(res->num, 1, "%s -> 1 result", e);
+		is(res->strings[0], e, "%s resolves to itself", e);
+		strings_free(res);
+
+		e = "tcp://localhost:5678";
+		res = vzmq_resolve(e, AF_UNSPEC);
+		isnt_null(res, "resolved %s to a list of endpoints", e);
+		is_int(res->num, 1, "%s -> 1 result", e);
+		is(res->strings[0], "tcp://127.0.0.1:5678", "localhost is 127.0.0.1");
+		strings_free(res);
+
+		e = "tcp://rr.tap.niftylogic.net:5678";
+		res = vzmq_resolve(e, AF_INET); /* IPv4 */
+		isnt_null(res, "resolved %s to a list of endpoints", e);
+		is_int(res->num, 3, "%s -> 3 results", e);
+		if (res->num == 3) {
+			int i, saw[3] = { 0 };
+			for (i = 0; i < 3; i++) {
+				if (strcmp(res->strings[i], "tcp://192.0.2.10:5678") == 0) saw[0]++;
+				if (strcmp(res->strings[i], "tcp://192.0.2.11:5678") == 0) saw[1]++;
+				if (strcmp(res->strings[i], "tcp://192.0.2.12:5678") == 0) saw[2]++;
+			}
+			is_int(saw[0], 1, "found 'tcp://192.0.2.10:5678' correct number of times");
+			is_int(saw[1], 1, "found 'tcp://192.0.2.11:5678' correct number of times");
+			is_int(saw[2], 1, "found 'tcp://192.0.2.12:5678' correct number of times");
+		} else {
+			diag(strings_join(res, "\n"));
+		}
+		strings_free(res);
+	}
+
 	log_close();
 	alarm(0);
 	done_testing();

@@ -42,6 +42,7 @@
 #include <syslog.h> /* so callers get LOG_* constants */
 #include <zmq.h>
 #include <pthread.h>
+#include <arpa/inet.h> /* so callers get AF_* constants */
 
 #define vmalloc(l)   mem_vmalloc(    (l), __func__, __FILE__, __LINE__)
 #define vcalloc(n,l) mem_vmalloc((n)*(l), __func__, __FILE__, __LINE__)
@@ -551,6 +552,7 @@ typedef struct {
 
 void* vzmq_ident(void *zocket, void *id);
 void vzmq_shutdown(void *zocket, int linger);
+strings_t* vzmq_resolve(const char *endpoint, int af);
 
 pdu_t* pdu_new(void);
 pdu_t* pdu_make(const char *type, size_t n, ...);

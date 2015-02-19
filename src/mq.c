@@ -182,6 +182,60 @@ void vzmq_shutdown(void *zocket, int linger)
 	zmq_close(zocket);
 }
 
+strings_t* vzmq_resolve(const char *endpoint, int af)
+{
+	strings_t *results = strings_new(NULL);
+
+	if (strncmp(endpoint, "tcp://", 6) != 0) {
+		strings_add(results, endpoint);
+		return results;
+	}
+
+	char *copy = strdup(endpoint);
+	char *a = copy + 6;
+	char *b = strrchr(a, ':');
+	if (!b) {
+		strings_add(results, endpoint);
+		return results;
+	}
+	*b++ = '\0';
+
+	struct addrinfo hints, *info, *p;
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family   = af;
+	hints.ai_socktype = SOCK_STREAM;
+
+	int rc = getaddrinfo(a, NULL, &hints, &info);
+	if (rc != 0) {
+		logger(LOG_DEBUG, "Failed to lookup %s: %s", a, gai_strerror(rc));
+		strings_add(results, endpoint);
+		return results;
+		free(copy);
+	}
+
+	for (p = info; p != NULL; p = p->ai_next) {
+		int fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+		if (fd < 0) continue;
+		close(fd);
+
+		char addr[INET6_ADDRSTRLEN];
+		if (p->ai_family == AF_INET
+		 && !inet_ntop(AF_INET, &((struct sockaddr_in*)p->ai_addr)->sin_addr,
+		               addr, sizeof(addr))) continue;
+
+		if (p->ai_family == AF_INET6
+		 && !inet_ntop(AF_INET6, &((struct sockaddr_in6*)p->ai_addr)->sin6_addr,
+		               addr, sizeof(addr))) continue;
+
+		char *s = string("tcp://%s:%s", addr, b);
+		strings_add(results, s);
+		free(s);
+	}
+	freeaddrinfo(info);
+	free(copy);
+	return results;
+}
+
 pdu_t* pdu_new(void)
 {
 	pdu_t *p = vmalloc(sizeof(pdu_t));
