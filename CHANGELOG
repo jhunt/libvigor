@@ -1,9 +1,18 @@
 master
 (1:0:0)
 
+  (none)
+
+
+
+1.2.2        2015-02-22
+(1:0:0)
+
   [ENHANCEMENTS]
   - New vzmq_resolve(char *endpoint, int af) function, for DNS
     resolution of 0MQ/TCP endpoints.
+
+  - SHA1 implementation, lifted from Clockwork.
 
 
 
