@@ -55,6 +55,7 @@ t/path
 t/proc
 t/reactor
 t/run
+t/sha1
 t/signals
 t/strings
 t/time

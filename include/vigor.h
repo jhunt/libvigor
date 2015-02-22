@@ -727,4 +727,40 @@ int run2(runner_t *ctx, char *cmd, ...);
 int daemonize(const char *pidfile, const char *user, const char *group);
 int cleanenv(int n, const char **keep);
 
+/*
+
+     ######  ##     ##    ###      ##
+    ##    ## ##     ##   ## ##   ####
+    ##       ##     ##  ##   ##    ##
+     ######  ######### ##     ##   ##
+          ## ##     ## #########   ##
+    ##    ## ##     ## ##     ##   ##
+     ######  ##     ## ##     ## ######
+
+ */
+#define SHA1_RAWLEN 20
+#define SHA1_HEXLEN 40+1
+
+typedef struct {
+	uint8_t  raw[SHA1_RAWLEN]; /* raw checksum, for bit comparison */
+	char     hex[SHA1_HEXLEN]; /* hex-formatted checksum, for display */
+
+	uint32_t state[5];
+	uint32_t count[2];
+	uint8_t  buffer[64];
+} sha1_t;
+
+void sha1_init(sha1_t *sha1);
+void sha1_update(sha1_t *sha1, const uint8_t *data, size_t len);
+void sha1_finish(sha1_t *sha1);
+
+void sha1_set(sha1_t *sha1, const char *hex);
+
+int sha1_fd(int fd, sha1_t* sha1);
+int sha1_file(const char *path, sha1_t* sha1);
+int sha1_data(const void *data, size_t len, sha1_t* sha1);
+
+int sha1_cmp(const sha1_t* a, const sha1_t *b);
+void sha1_hex(sha1_t *sha1);
+
 #endif
