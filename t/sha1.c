@@ -84,6 +84,19 @@ TESTS {
 	ok(sha1_file("/tmp",  &cksum) < 0, "sha1_file on directory fails");
 	ok(sha1_file("/nope", &cksum) < 0, "sha1_file on non-existent file fails");
 
+	FILE *io = fopen("t/tmp/out.file", "w");
+	if (!io) BAIL_OUT("failed to open t/tmp/out.file for writing");
+
+	fprintf(io, "Robot Haiku\n"
+	            "-----------\n"
+	            "Seven hundred ten\n"
+	            "Seven hundred eleven\n"
+	            "Seven hundred twelve\n");
+	fclose(io);
+	ok(sha1_file("t/tmp/out.file", &cksum) == 0, "sha1_file succeeds");
+	is_string(cksum.hex, "e958bd59716ff22c0541497284849faae94acbda",
+			"calculated sha1 of test file");
+	unlink("t/tmp/out.file");
 
 	done_testing();
 }
