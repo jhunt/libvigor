@@ -341,7 +341,7 @@ TESTS {
 		strings_free(res);
 
 		e = "tcp://localhost:5678";
-		res = vzmq_resolve(e, AF_UNSPEC);
+		res = vzmq_resolve(e, AF_INET); /* IPv4 */
 		isnt_null(res, "resolved %s to a list of endpoints", e);
 		is_int(res->num, 1, "%s -> 1 result", e);
 		is(res->strings[0], "tcp://127.0.0.1:5678", "localhost is 127.0.0.1");
