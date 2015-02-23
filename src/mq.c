@@ -265,6 +265,7 @@ pdu_t* pdu_make(const char *type, size_t n, ...)
 
 pdu_t* pdu_reply(pdu_t *orig, const char *type, size_t n, ...)
 {
+	assert(orig);
 	assert(type);
 	assert(n >= 0);
 
@@ -281,6 +282,18 @@ pdu_t* pdu_reply(pdu_t *orig, const char *type, size_t n, ...)
 	va_end(ap);
 
 	return p;
+}
+
+pdu_t *pdu_dup(pdu_t *from, const char *type)
+{
+	assert(from);
+
+	pdu_t *to = pdu_make(type ? type : pdu_type(from), 0);
+	if (pdu_copy(to, from, 1, 0) != 0) {
+		pdu_free(to);
+		return NULL;
+	}
+	return to;
 }
 
 char* pdu_peer(pdu_t *p)
@@ -319,6 +332,22 @@ void pdu_free(pdu_t *p)
 		s_frame_free(f);
 
 	free(p);
+}
+
+int pdu_copy(pdu_t *to, pdu_t *from, int start, int n)
+{
+	assert(from);
+	assert(start >= 0);
+	assert(n >= 0);
+
+	int i, end = n ? start + n : pdu_size(from);
+	for (i = start; i < pdu_size(from) && i < end; i++) {
+		size_t len;
+		uint8_t *buf = pdu_segment(from, i, &len);
+		pdu_extend(to, buf, len);
+		free(buf);
+	}
+	return 0;
 }
 
 static void s_pdu_extend(pdu_t *p, frame_t *f)
