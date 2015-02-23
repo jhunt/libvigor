@@ -30,9 +30,11 @@
 #include <sys/resource.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
 
 #include <unistd.h>
 #include <pthread.h>
+#include <netdb.h>
 
 #ifndef TEST_DATA
 #define TEST_DATA "t/data"
