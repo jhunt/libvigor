@@ -31,11 +31,11 @@ TESTS {
 	int i;
 
 	sha1_init(&cksum);
-	sha1_data(FIPS1_IN, strlen(FIPS1_IN), &cksum);
+	sha1_data(&cksum, FIPS1_IN, strlen(FIPS1_IN));
 	is_string(cksum.hex, FIPS1_OUT, "FIPS Pub 180-1 test vector #1");
 
 	sha1_init(&cksum);
-	sha1_data(FIPS2_IN, strlen(FIPS2_IN), &cksum);
+	sha1_data(&cksum, FIPS2_IN, strlen(FIPS2_IN));
 	is_string(cksum.hex, FIPS2_OUT, "FIPS Pub 180-1 test vector #2");
 
 	/* it's hard to define a string constant for 1 mil 'a's... */
@@ -51,7 +51,7 @@ TESTS {
 	is_string(calc.hex, "", "initial blank checksum");
 
 	/* Borrow from FIPS checks */
-	sha1_data("this is a test", strlen("this is a test"), &calc);
+	sha1_data(&calc, "this is a test", strlen("this is a test"));
 	sha1_set(&init, calc.hex);
 	is_string(calc.hex, init.hex, "init.hex == calc.hex");
 
@@ -74,15 +74,15 @@ TESTS {
 	sha1_init(&a);
 	sha1_init(&b);
 
-	sha1_data(s1, strlen(s1), &a);
-	sha1_data(s2, strlen(s2), &b);
+	sha1_data(&a, s1, strlen(s1));
+	sha1_data(&b, s2, strlen(s2));
 
 	ok(sha1_cmp(&a, &a) == 0, "identical checksums are equal");
 	ok(sha1_cmp(&a, &b) != 0, "different checksums are not equal");
 
 
-	ok(sha1_file("/tmp",  &cksum) < 0, "sha1_file on directory fails");
-	ok(sha1_file("/nope", &cksum) < 0, "sha1_file on non-existent file fails");
+	ok(sha1_file(&cksum, "/tmp")  < 0, "sha1_file on directory fails");
+	ok(sha1_file(&cksum, "/nope") < 0, "sha1_file on non-existent file fails");
 
 	FILE *io = fopen("t/tmp/out.file", "w");
 	if (!io) BAIL_OUT("failed to open t/tmp/out.file for writing");
@@ -93,7 +93,7 @@ TESTS {
 	            "Seven hundred eleven\n"
 	            "Seven hundred twelve\n");
 	fclose(io);
-	ok(sha1_file("t/tmp/out.file", &cksum) == 0, "sha1_file succeeds");
+	ok(sha1_file(&cksum, "t/tmp/out.file") == 0, "sha1_file succeeds");
 	is_string(cksum.hex, "e958bd59716ff22c0541497284849faae94acbda",
 			"calculated sha1 of test file");
 	unlink("t/tmp/out.file");

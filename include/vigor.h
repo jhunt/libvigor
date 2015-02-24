@@ -756,9 +756,9 @@ void sha1_finish(sha1_t *sha1);
 
 void sha1_set(sha1_t *sha1, const char *hex);
 
-int sha1_fd(int fd, sha1_t* sha1);
-int sha1_file(const char *path, sha1_t* sha1);
-int sha1_data(const void *data, size_t len, sha1_t* sha1);
+int sha1_fd(sha1_t *sha1, int fd);
+int sha1_file(sha1_t *sha1, const char *path);
+int sha1_data(sha1_t *sha1, const void *data, size_t len);
 
 int sha1_cmp(const sha1_t* a, const sha1_t *b);
 void sha1_hex(sha1_t *sha1);
