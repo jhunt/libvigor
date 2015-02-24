@@ -7,6 +7,16 @@ master
 
 
 
+1.2.3        2015-02-24
+(1:0:0)
+
+  [BUG FIXES]
+  - Fix argument order in SHA1 functions, to correspond with
+    conventions used elsewhere in libvigor.  Namely, sha1_*() should
+    take the sha1_t as the first argument, not the last.
+
+
+
 1.2.2        2015-02-22
 (1:0:0)
 

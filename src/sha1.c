@@ -231,7 +231,7 @@ int sha1_cmp(const sha1_t *a, const sha1_t *b)
   On failure, returns non-zero, and the contents of $sha1
   are undefined.
  */
-int sha1_fd(int fd, sha1_t *sha1)
+int sha1_fd(sha1_t *sha1, int fd)
 {
 	char buf[SHA1_FD_BUFSIZE];
 	ssize_t nread;
@@ -260,7 +260,7 @@ int sha1_fd(int fd, sha1_t *sha1)
   On failure, returns non-zero, and the contents of $sha1
   are undefined.
  */
-int sha1_file(const char *path, sha1_t *sha1) {
+int sha1_file(sha1_t *sha1, const char *path) {
 	int fd;
 	struct stat st;
 
@@ -276,7 +276,7 @@ int sha1_file(const char *path, sha1_t *sha1) {
 		return -1;
 	}
 
-	sha1_fd(fd, sha1);
+	sha1_fd(sha1, fd);
 
 	close(fd);
 	return 0;
@@ -296,7 +296,7 @@ int sha1_file(const char *path, sha1_t *sha1) {
   On failure, returns non-zero, and the contents of $sha1
   are undefined.
  */
-int sha1_data(const void *data, size_t len, sha1_t *sha1)
+int sha1_data(sha1_t *sha1, const void *data, size_t len)
 {
 	sha1_init(sha1);
 	sha1_update(sha1, (uint8_t *)data, len);
