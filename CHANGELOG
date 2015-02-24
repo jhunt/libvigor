@@ -1,7 +1,9 @@
 master
 (1:0:0)
 
-  (none)
+  - New pdu_dup() function for duplicating a PDU
+
+  - New pdu_copy() function for copying sections of a PDU
 
 
 

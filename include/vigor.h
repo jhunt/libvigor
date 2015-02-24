@@ -557,12 +557,14 @@ strings_t* vzmq_resolve(const char *endpoint, int af);
 pdu_t* pdu_new(void);
 pdu_t* pdu_make(const char *type, size_t n, ...);
 pdu_t* pdu_reply(pdu_t *p, const char *type, size_t n, ...);
+pdu_t* pdu_dup(pdu_t *from, const char *type);
 void pdu_free(pdu_t *p);
 
 #define pdu_size(p) ((p)->len)
 char* pdu_peer(pdu_t *p);
 char* pdu_type(pdu_t *p);
 
+int pdu_copy(pdu_t *to, pdu_t *from, int start, int n);
 int pdu_extend (pdu_t *p, const void *buf, size_t len);
 int pdu_extendf(pdu_t *p, const char *fmt, ...);
 
