@@ -645,7 +645,9 @@ typedef struct {
 	void    *pub;
 	void    *sub;
 
+	pthread_t       tid;
 	pthread_mutex_t lock;
+	pthread_mutex_t exit;
 } ha_t;
 
 ha_t* ha_new(int state);
@@ -659,8 +661,8 @@ int ha_isprimary(ha_t *m);
 int ha_isstandby(ha_t *m);
 int ha_isactive(ha_t *m);
 int ha_ispassive(ha_t *m);
-void* ha_startup(ha_t *m);
-void ha_shutdown(void *handle);
+int ha_startup(ha_t *m);
+void ha_shutdown(ha_t *m);
 
 /*
 

@@ -158,20 +158,19 @@ TESTS {
 		rc = ha_connect(fred, "inproc://barney.pub"); if (rc != 0) BAIL_OUT("failed to connect SUB socket");
 		rc = ha_connect(barney, "inproc://fred.pub"); if (rc != 0) BAIL_OUT("failed to connect SUB socket");
 
-		void *fred_tid   = ha_startup(fred);
-		void *barney_tid = ha_startup(barney);
-		diag("started full-stack test");
+		ok(ha_startup(fred)   == 0, "started up fred HA peer");
+		ok(ha_startup(barney) == 0, "started up barney HA peer");
 
 		sleep_ms(500);
 		ok(ha_isactive(fred),    "FRED is now active");
 		ok(ha_ispassive(barney), "BARNEY is now passive");
 
-		ha_shutdown(fred_tid);
+		ha_shutdown(fred);
 		sleep_ms(500);
 		is_int(ha_check(barney, HA_CLIENT_REQUEST), 0, "BARNEY takes over for FRED");
 		ok(ha_isactive(barney), "BARNEY is now active");
 
-		ha_shutdown(barney_tid);
+		ha_shutdown(barney);
 		diag("full-stack test complete");
 
 		ha_free(fred);

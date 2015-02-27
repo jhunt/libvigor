@@ -55,6 +55,7 @@ ha_t* ha_new(int state)
 {
 	ha_t *m = vcalloc(1, sizeof(ha_t));
 	pthread_mutex_init(&m->lock, NULL);
+	pthread_mutex_init(&m->exit, NULL);
 	m->state = state;
 	m->heartbeat = 1000;
 	m->expiry = time_ms() + 2 * m->heartbeat;
@@ -63,6 +64,7 @@ ha_t* ha_new(int state)
 
 void ha_free(ha_t *m)
 {
+	pthread_mutex_destroy(&m->exit);
 	pthread_mutex_destroy(&m->lock);
 	vzmq_shutdown(m->sub, 0);
 	vzmq_shutdown(m->pub, 500);
@@ -214,6 +216,11 @@ static void* ha_thread(void *_)
 		if (rc == -1)
 			break;
 
+		rc = pthread_mutex_trylock(&m->exit);
+		if (rc != 0)
+			break; // someone locked 'exit'; we should shutdown
+		pthread_mutex_unlock(&m->exit);
+
 		if (socks[0].revents & ZMQ_POLLIN) {
 			pdu_t *pdu = pdu_recv(m->sub);
 			assert(pdu);
@@ -244,23 +251,15 @@ static void* ha_thread(void *_)
 
 	return m;
 }
-void* ha_startup(ha_t *m)
+int ha_startup(ha_t *m)
 {
-	pthread_t *tid = vmalloc(sizeof(pthread_t));
-
-	int rc = pthread_create(tid, NULL, ha_thread, m);
-	assert(rc == 0);
-
-	return tid;
+	return pthread_create(&m->tid, NULL, ha_thread, m);
 }
 
-void ha_shutdown(void *handle)
+void ha_shutdown(ha_t *m)
 {
-	pthread_t *tid = (pthread_t*)handle;
-	pthread_cancel(*tid);
-
 	void *_;
-	pthread_join(*tid, &_);
-
-	free(tid);
+	pthread_mutex_lock(&m->exit);
+	pthread_join(m->tid, &_);
+	pthread_mutex_unlock(&m->exit);
 }

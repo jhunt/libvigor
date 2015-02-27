@@ -5,6 +5,12 @@ master
 
   - New pdu_copy() function for copying sections of a PDU
 
+  - Better shutdown signalling for the HA implementation
+    Now, instead of pthread_cancel(), ha_shutdown() locks an exit
+    mutex that signals to the HA thread that it needs to terminate
+    gracefully.  This should make HA-based reactors more amenable
+    to testing and instrumentation.
+
 
 
 1.2.3        2015-02-24
