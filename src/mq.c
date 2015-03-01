@@ -236,6 +236,27 @@ strings_t* vzmq_resolve(const char *endpoint, int af)
 	return results;
 }
 
+int vzmq_connect_af(void *z, const char *endpoint, int af)
+{
+	strings_t *names = vzmq_resolve(endpoint, af);
+	if (names->num == 0) {
+		errno = ENOENT;
+		return 1;
+	}
+
+	int rc;
+	unsigned int i;
+	for (i = 0; i < names->num; i++) {
+		logger(LOG_DEBUG, "trying endpoint %s (from %s)", names->strings[i], endpoint);
+		rc = zmq_connect(z, names->strings[i]);
+		if (rc == 0)
+			break;
+	}
+
+	strings_free(names);
+	return rc;
+}
+
 pdu_t* pdu_new(void)
 {
 	pdu_t *p = vmalloc(sizeof(pdu_t));

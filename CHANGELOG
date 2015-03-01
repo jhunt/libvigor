@@ -1,6 +1,12 @@
 master
 (1:0:0)
 
+  (none)
+
+
+1.2.4        2015-03-01
+(1:0:0)
+
   [ENHANCEMENTS]
 
   - New pdu_dup() function for duplicating a PDU
@@ -12,6 +18,11 @@ master
     mutex that signals to the HA thread that it needs to terminate
     gracefully.  This should make HA-based reactors more amenable
     to testing and instrumentation.
+
+  - New vzmq_connect() function, that ties vzmq_resolve() together
+    with plain old zmq_connect(), as a drop-in replacement.
+    If you need to control which address families (IPv4 / IPv6) are
+    considered for resolution, vzmq_connect_af() is provided.
 
 
   [BUG FIXES]
