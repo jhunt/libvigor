@@ -1,6 +1,8 @@
 master
 (1:0:0)
 
+  [ENHANCEMENTS]
+
   - New pdu_dup() function for duplicating a PDU
 
   - New pdu_copy() function for copying sections of a PDU
@@ -10,6 +12,12 @@ master
     mutex that signals to the HA thread that it needs to terminate
     gracefully.  This should make HA-based reactors more amenable
     to testing and instrumentation.
+
+
+  [BUG FIXES]
+
+  - Fix overflow in HA time handling.  The HA thread will now no
+    longer send packets at mind-boggling high rates.
 
 
 

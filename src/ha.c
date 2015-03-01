@@ -205,7 +205,7 @@ static void* ha_thread(void *_)
 {
 	ha_t *m = (ha_t*)_;
 
-	int next = time_ms() + m->heartbeat;
+	int64_t next = time_ms() + m->heartbeat;
 	while (!signalled()) {
 		zmq_pollitem_t socks[] = {{ m->sub, 0, ZMQ_POLLIN, 0 }};
 		int left = (int)((next - time_ms()));
