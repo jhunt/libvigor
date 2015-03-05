@@ -23,7 +23,7 @@ Description: Missing Bits of C
 Package: libvigor-dev
 Architecture: any
 Section: libdevel
-Depends: ${misc:Depends}, ${shlibs:Depends}
+Depends: libzmq3-dev, ${misc:Depends}, ${shlibs:Depends}
 Description: Missing Bits of C - development tools
  libvigor is a set of primitives for getting past the inherent shortcomings
  of a beautifully simple language like C.  It provides robust list and hash
