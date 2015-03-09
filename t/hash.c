@@ -167,6 +167,30 @@ TESTS {
 		hash_done(&b, 0);
 	}
 
+	subtest {
+		hash_t h;
+		memset(&h, 0, sizeof(h));
+
+		char key[4096];
+		memset(key, '.', 4096);
+		key[0] = 'A';
+		key[4095] = 'Z';
+
+		hash_set(&h, key, "some value");
+		char *k, *v;
+
+		ok(hash_get(&h, key), "retrieved 4kb key");
+		size_t n = 0;
+		for_each_key_value(&h, k, v) {
+			n++;
+			is_string(k, key, "retrieved full key from keyval traversal");
+			is_string(v, "some value", "retrieved value");
+		}
+		is_int(n, 1, "only found one key/value");
+
+		hash_done(&h, 0);
+	}
+
 	alarm(0);
 	done_testing();
 }
