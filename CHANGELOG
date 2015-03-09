@@ -1,10 +1,26 @@
 master
 (1:0:0)
 
+  (none)
+
+
+
+1.2.5        2015-03-08
+(1:0:0)
+
+  [BUG FIXES]
+
+  - Fix a bug in sha1_update() that called s_transform() on the
+    user-supplied buffer, effectively destroying the data given.
+    Only occured for sha1_update()'s of buffers > 64 characters.
+    SHA1 checksums were still calculated correctly.
+
+
   [PACKAGING]
 
   - Debian libvigor-dev package should depend on upstream *-dev
     packages for header files like zmq.h
+
 
 
 1.2.4        2015-03-01

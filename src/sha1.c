@@ -126,7 +126,8 @@ void sha1_update(sha1_t* sha1, const uint8_t* data, const size_t len)
 		memcpy(&sha1->buffer[j], data, (i = 64-j));
 		s_transform(sha1->state, sha1->buffer);
 		for ( ; i + 63 < len; i += 64) {
-			s_transform(sha1->state, data + i);
+			memcpy(sha1->buffer, data + i, 64);
+			s_transform(sha1->state, sha1->buffer);
 		}
 		j = 0;
 	}
@@ -299,7 +300,7 @@ int sha1_file(sha1_t *sha1, const char *path) {
 int sha1_data(sha1_t *sha1, const void *data, size_t len)
 {
 	sha1_init(sha1);
-	sha1_update(sha1, (uint8_t *)data, len);
+	sha1_update(sha1, (const uint8_t *)data, len);
 	sha1_finish(sha1);
 
 	return 0;
