@@ -355,6 +355,7 @@ int pdu_attn(pdu_t *p, const char *peer)
 
 	s_frame_free(p->address);
 	p->address = s_frame_new(addr, len, 0);
+	free(addr);
 	return 0;
 }
 
