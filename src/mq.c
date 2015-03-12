@@ -320,14 +320,13 @@ pdu_t *pdu_dup(pdu_t *from, const char *type)
 char* pdu_peer(pdu_t *p)
 {
 	if (!p->peer && p->address) {
-		static const char hex[] = "0123456789abcdef";
-		p->peer = vcalloc(2 * s_frame_size(p->address) + 1, sizeof(char));
-
-		size_t i, len = s_frame_size(p->address);
 		const char *data = s_frame_data(p->address);
-		for (i = 0; i < len; i++) {
-			p->peer[i * 2 + 0] = hex[(data[i] & 0xf0) >> 4];
-			p->peer[i * 2 + 1] = hex[ data[i] & 0x0f      ];
+		size_t len = s_frame_size(p->address);
+
+		p->peer = vmalloc(2 * len + 1);
+		if (base16_encode(p->peer, 2 * len, data, len) != 2 * len) {
+			free(p->peer);
+			p->peer = NULL;
 		}
 	}
 	return p->peer;
@@ -338,6 +337,25 @@ char* pdu_type(pdu_t *p)
 	if (!p->type)
 		p->type = pdu_string(p, 0);
 	return p->type;
+}
+
+int pdu_attn(pdu_t *p, const char *peer)
+{
+	if (p->peer)
+		free(p->peer);
+
+	p->peer = strdup(peer);
+	size_t len = strlen(peer) / 2;
+
+	char *addr = vmalloc(len);
+	if (base16_decode(addr, len, peer, len * 2) != len) {
+		free(addr);
+		return 1;
+	}
+
+	s_frame_free(p->address);
+	p->address = s_frame_new(addr, len, 0);
+	return 0;
 }
 
 void pdu_free(pdu_t *p)

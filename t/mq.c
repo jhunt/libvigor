@@ -418,6 +418,39 @@ TESTS {
 		pdu_free(orig);
 	}
 
+	subtest { /* pdu_peer / pdu_attn */
+		void *z = zmq_ctx_new(); assert(z);
+		void *server = zmq_socket(z, ZMQ_ROUTER); assert(server);
+		void *client = zmq_socket(z, ZMQ_DEALER); assert(client);
+
+		int rc = zmq_bind(server, "inproc://peering");
+		assert(rc == 0);
+
+		rc = zmq_connect(client, "inproc://peering");
+		assert(rc == 0);
+
+		pdu_t *c1 = pdu_make("PING", 0);
+		ok(pdu_send_and_free(c1, client) == 0, "sent C1 PDU");
+		pdu_t *s1 = pdu_recv(server);
+		isnt_null(s1, "received S1 PDU");
+
+		isnt_null(pdu_peer(s1), "received a non-NULL peer address from client");
+
+		pdu_t *s2 = pdu_make("PONG", 0);
+		ok(pdu_attn(s2, pdu_peer(s1)) == 0, "Set the address frame via pdu_attn");
+		ok(pdu_send_and_free(s2, server) == 0, "sent S2 reply PDU");
+		pdu_t *c2 = pdu_recv(client);
+		isnt_null(c2, "client received reply PDU");
+		is_string(pdu_type(c2), "PONG", "PONG!");
+
+		pdu_free(s1);
+		pdu_free(c2);
+
+		vzmq_shutdown(client, 0);
+		vzmq_shutdown(server, 0);
+		zmq_ctx_destroy(z);
+	}
+
 	log_close();
 	alarm(0);
 	done_testing();

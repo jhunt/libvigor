@@ -5,6 +5,20 @@ master
 
 
 
+1.2.6        2015-03-11
+(1:0:0)
+
+  [ENHANCEMENTS]
+
+  - New pdu_attn() function for setting the binary dest. address
+    frame of a new PDU based on the hex-encoded ascii-safe peer
+    address from a previous interaction.
+
+  - Dropped internal hex conversion code in pdu_peer(), in favor
+    of base16_* functions from basex.o
+
+
+
 1.2.5        2015-03-08
 (1:0:0)
 

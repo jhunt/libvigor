@@ -565,6 +565,7 @@ void pdu_free(pdu_t *p);
 #define pdu_size(p) ((p)->len)
 char* pdu_peer(pdu_t *p);
 char* pdu_type(pdu_t *p);
+int pdu_attn(pdu_t *p, const char *peer);
 
 int pdu_copy(pdu_t *to, pdu_t *from, int start, int n);
 int pdu_extend (pdu_t *p, const void *buf, size_t len);
