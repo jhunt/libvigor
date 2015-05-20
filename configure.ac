@@ -1,5 +1,5 @@
 AC_INIT([libvigor], [1.2.6], [bugs@niftylogic.com])
-AC_PREREQ(2.68)
+AC_PREREQ(2.63)
 AC_CONFIG_SRCDIR([include/vigor.h])
 AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build])
@@ -8,7 +8,11 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 
 AC_PROG_CC
 AC_PROG_INSTALL
-AM_PROG_AR
+
+# AM_PROG_AR is used for linker stuff, but only by newer Automake
+# On older Automakes (<1.12 IIRC) it just complains during ./bootstrap
+# so we use the ifndef trick here to expand if expandable.
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 LT_INIT
 
