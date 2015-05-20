@@ -7,7 +7,7 @@ ACLOCAL_AMFLAGS  = -I build
 
 ############################################################
 
-AM_CFLAGS = -Iinclude -Wall $(DEPS_CFLAGS)
+AM_CFLAGS = -I$(srcdir)/include -Wall $(DEPS_CFLAGS)
 AM_CFLAGS += @GCOV_CFLAGS@
 
 ############################################################
@@ -148,7 +148,7 @@ t/tmp/check-data-install.stamp:
 
 bin_PROGRAMS = fuzz-config
 fuzz_config_SOURCES = fuzz/config.c include/vigor.h
-fuzz_config_LDFLAGS = libvigor.la
+fuzz_config_LDADD = libvigor.la
 
 ############################################################
 
