@@ -52,8 +52,8 @@ void* mem_vmalloc(size_t, const char*, const char*, unsigned int);
 #  define mem_trace   mtrace
 #  define mem_untrace muntrace
 #else
-#  define mem_trace
-#  define mem_untrace
+#  define mem_trace()
+#  define mem_untrace()
 #endif
 
 /*
