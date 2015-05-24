@@ -47,6 +47,14 @@
 #define vmalloc(l)   mem_vmalloc(    (l), __func__, __FILE__, __LINE__)
 #define vcalloc(n,l) mem_vmalloc((n)*(l), __func__, __FILE__, __LINE__)
 void* mem_vmalloc(size_t, const char*, const char*, unsigned int);
+#if VIGOR_MEM_TRACE
+#  include <mcheck.h>
+#  define mem_trace   mtrace
+#  define mem_untrace muntrace
+#else
+#  define mem_trace
+#  define mem_untrace
+#endif
 
 /*
     ##       ####  ######  ########  ######
