@@ -466,6 +466,14 @@ char* pdu_string(pdu_t *p, unsigned int i)
 #define s_frame_send(f,zocket) \
 	zmq_msg_send(&(f)->msg, (zocket), s_frame_isfinal(f) ? 0 : ZMQ_SNDMORE)
 
+static int _zmq_socktype(void *z)
+{
+	int v, rc;
+	size_t len = sizeof(v);
+	rc = zmq_getsockopt(z, ZMQ_TYPE, &v, &len);
+	return rc ? rc : v;
+}
+
 int pdu_send(pdu_t *p, void *zocket)
 {
 	assert(p);
@@ -473,15 +481,17 @@ int pdu_send(pdu_t *p, void *zocket)
 
 	int rc;
 
-	if (p->address) {
-		rc = s_frame_sendm(FRAME(p->address), zocket);
+	if (_zmq_socktype(zocket) != ZMQ_PUB) {
+		if (p->address) {
+			rc = s_frame_sendm(FRAME(p->address), zocket);
+			if (rc < 0) return rc;
+		}
+
+		frame_t *blank = s_frame_new("", 0, 0);
+		rc = s_frame_sendm(blank, zocket);
+		s_frame_free(blank);
 		if (rc < 0) return rc;
 	}
-
-	frame_t *blank = s_frame_new("", 0, 0);
-	rc = s_frame_sendm(blank, zocket);
-	s_frame_free(blank);
-	if (rc < 0) return rc;
 
 	frame_t *f;
 	for_each_object(f, &p->frames, l) {
@@ -508,6 +518,9 @@ pdu_t* pdu_recv(void *zocket)
 
 	int body = 0, fin = 0;
 	frame_t *f;
+
+	if (_zmq_socktype(zocket) == ZMQ_SUB)
+		body = 1; /* skip the empty addressing frame */
 
 	for (;;) {
 		f = s_frame_recv(zocket);

@@ -450,6 +450,39 @@ TESTS {
 		zmq_ctx_destroy(z);
 	}
 
+	subtest { /* PUB/SUB send/receive */
+		void *z = zmq_ctx_new(); assert(z);
+		void *server = zmq_socket(z, ZMQ_PUB); assert(server);
+		void *client = zmq_socket(z, ZMQ_SUB); assert(server);
+
+		int rc = zmq_bind(server, "inproc://broadcast");
+		assert(rc == 0);
+
+		rc = zmq_setsockopt(client, ZMQ_SUBSCRIBE, "", 0);
+		assert(rc == 0);
+
+		rc = zmq_connect(client, "inproc://broadcast");
+		assert(rc == 0);
+
+		pdu_t *s1 = pdu_make("ATTN", 2, "missive", "IMPORTANT!");
+		ok(pdu_send_and_free(s1, server) == 0, "sent ATTN broadcast PDU");
+
+		pdu_t *c1 = pdu_recv(client);
+		isnt_null(c1, "received ATTN PDU from broadcaster");
+		char *s;
+		is_string(pdu_type(c1), "ATTN", "First frame is type of PDU");
+		is_int(pdu_size(c1), 3, "PDU consists of three frames");
+		is_string(s = pdu_string(c1, 0), "ATTN",       "frame 0"); free(s);
+		is_string(s = pdu_string(c1, 1), "missive",    "frame 1"); free(s);
+		is_string(s = pdu_string(c1, 2), "IMPORTANT!", "frame 2"); free(s);
+		is_null(s = pdu_string(c1, 3), "frame 3 should not exist"); free(s);
+		pdu_free(c1);
+
+		vzmq_shutdown(client, 0);
+		vzmq_shutdown(server, 0);
+		zmq_ctx_destroy(z);
+	}
+
 	log_close();
 	alarm(0);
 	done_testing();
