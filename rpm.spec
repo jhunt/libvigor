@@ -1,5 +1,5 @@
 Name:           libvigor
-Version:        1.2.6
+Version:        1.2.7
 Release:        1%{?dist}
 Summary:        Missing Bits of C
 
@@ -70,5 +70,8 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Jun 10 2015 James Hunt <james@niftylogic.com> 1.2.7-1
+- Upstream release
+
 * Tue May 19 2015 James Hunt <james@niftylogic.com> 1.2.6-1
 - Initial RPM package
