@@ -29,7 +29,7 @@ cat > $SUPPS <<EOF
 }
 EOF
 
-libtool --mode=execute $VG --tool=memcheck --leak-check=full --show-leak-kinds=all --error-exitcode=$EFAIL --suppressions=$SUPPS "$@" 2>$TEMPFILE >/dev/null
+libtool --mode=execute $VG --tool=memcheck --leak-check=full --error-exitcode=$EFAIL --suppressions=$SUPPS "$@" 2>$TEMPFILE >/dev/null
 if [[ $? == $EFAIL ]]; then
 	echo "FAIL: $@"
 	cat >&2 $TEMPFILE
