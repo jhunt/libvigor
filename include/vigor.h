@@ -562,7 +562,7 @@ void* vzmq_ident(void *zocket, void *id);
 void vzmq_shutdown(void *zocket, int linger);
 strings_t* vzmq_resolve(const char *endpoint, int af);
 int vzmq_connect_af(void *z, const char *endpoint, int af);
-#define vzmq_connect(z,e) vzmq_connect_af((z),(e))
+#define vzmq_connect(z,e) vzmq_connect_af((z),(e), AF_UNSPEC)
 
 pdu_t* pdu_new(void);
 pdu_t* pdu_make(const char *type, size_t n, ...);
