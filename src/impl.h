@@ -80,5 +80,15 @@ struct cache_t {
 	struct cachent  entries[];
 };
 
+struct lock_t {
+	const char *path;
+
+	int valid;
+	int fd;
+
+	pid_t   pid;
+	uid_t   uid;
+	int32_t time;
+};
 
 #endif

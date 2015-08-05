@@ -324,18 +324,10 @@ int proc_stat(pid_t pid, proc_t *ps);
  */
 
 #define VIGOR_LOCK_SKIPEUID 1
-typedef struct {
-	const char *path;
+typedef struct lock_t lock_t;
 
-	int valid;
-	int fd;
-
-	pid_t   pid;
-	uid_t   uid;
-	int32_t time;
-} lock_t;
-
-void lock_init  (lock_t *lock, const char *path);
+lock_t *lock_new(const char *path);
+void lock_free(lock_t *lock);
 int lock_acquire(lock_t *lock, int flags);
 int lock_release(lock_t *lock);
 char* lock_info (lock_t *lock);

@@ -18,27 +18,26 @@
  */
 
 #include "test.h"
+#include "../src/impl.h"
 
 TESTS {
 	alarm(5);
 	subtest {
-		lock_t L;
-		lock_init(&L, TEST_TMP "/test.lock");
+		lock_t *L = lock_new(TEST_TMP "/test.lock");
 
-		ok(!L.valid, "initial lock is invalid");
-		is_string(lock_info(&L), "<invalid lock file>",
+		ok(!L->valid, "initial lock is invalid");
+		is_string(lock_info(L), "<invalid lock file>",
 			"string representation of an invalid lock");
 
-		ok(lock_acquire(&L, 0) == 0, "Acquired lock");
+		ok(lock_acquire(L, 0) == 0, "Acquired lock");
 
-		lock_t L2;
-		lock_init(&L2, TEST_TMP "/test.lock");
-		ok(lock_acquire(&L2, 0) != 0, "Failed to acquire a held lock");
+		lock_t *L2 = lock_new(TEST_TMP "/test.lock");
+		ok(lock_acquire(L2, 0) != 0, "Failed to acquire a held lock");
 
-		ok(lock_release(&L) == 0, "Released lock");
-		ok(lock_release(&L) != 0, "Cannot release an un-held lock");
+		ok(lock_release(L) == 0, "Released lock");
+		ok(lock_release(L) != 0, "Cannot release an un-held lock");
 
-		ok(lock_acquire(&L2, 0) == 0, "Acquired newly-released lock");
+		ok(lock_acquire(L2, 0) == 0, "Acquired newly-released lock");
 	}
 
 	alarm(0);

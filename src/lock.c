@@ -48,15 +48,22 @@ static int s_lock_details(lock_t *lock)
 
  */
 
-void lock_init(lock_t *lock, const char *path)
+lock_t *lock_new(const char *path)
 {
-	assert(lock); // LCOV_EXCL_LINE
+	lock_t *lock = vmalloc(sizeof(lock_t));
 	lock->path  = path;
 	lock->valid =  0;
 	lock->fd    = -1;
 	lock->pid   =  0;
 	lock->uid   =  0;
 	lock->time  = -1;
+
+	return lock;
+}
+
+void lock_free(lock_t *lock)
+{
+	free(lock);
 }
 
 int lock_acquire(lock_t *lock, int flags)
