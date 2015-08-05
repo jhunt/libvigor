@@ -589,20 +589,7 @@ int reactor_go(reactor_t *r);
 #define HA_CLIENT_REQUEST  5
 #define HA_MAX_EVENT       5
 
-typedef struct {
-	int      state;
-	int      event;
-
-	int64_t  heartbeat;
-	int64_t  expiry;
-
-	void    *pub;
-	void    *sub;
-
-	pthread_t       tid;
-	pthread_mutex_t lock;
-	pthread_mutex_t exit;
-} ha_t;
+typedef struct ha_t ha_t;
 
 ha_t* ha_new(int state);
 void ha_free(ha_t *m);
@@ -630,18 +617,7 @@ void ha_shutdown(ha_t *m);
 
  */
 
-typedef struct {
-	int    interval;
-	int    freshness;
-	double backoff;
-	int    max_delay;
-
-	int    expiry;
-
-	/* state values */
-	int    delay;
-	int    missed;
-} hb_t;
+typedef struct hb_t hb_t;
 
 int hb_init(hb_t*, int, int, double, int);
 int hb_ping(hb_t*);

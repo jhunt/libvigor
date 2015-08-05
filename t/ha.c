@@ -18,6 +18,7 @@
  */
 
 #include "test.h"
+#include "../src/impl.h"
 
 static int64_t EXPIRY = 0;
 

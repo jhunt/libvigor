@@ -123,4 +123,32 @@ struct trustdb_t {
 	list_t  certs;
 };
 
+struct hb_t {
+	int    interval;
+	int    freshness;
+	double backoff;
+	int    max_delay;
+
+	int    expiry;
+
+	/* state values */
+	int    delay;
+	int    missed;
+};
+
+struct ha_t {
+	int      state;
+	int      event;
+
+	int64_t  heartbeat;
+	int64_t  expiry;
+
+	void    *pub;
+	void    *sub;
+
+	pthread_t       tid;
+	pthread_mutex_t lock;
+	pthread_mutex_t exit;
+};
+
 #endif

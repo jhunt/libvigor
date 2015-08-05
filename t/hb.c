@@ -18,6 +18,7 @@
  */
 
 #include "test.h"
+#include "../src/impl.h"
 
 TESTS {
 	alarm(5);
