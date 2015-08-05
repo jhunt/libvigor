@@ -44,6 +44,8 @@
 #include <pthread.h>
 #include <arpa/inet.h> /* so callers get AF_* constants */
 
+void vigor_version(int *maj, int *min, int *rev);
+
 #define vmalloc(l)   mem_vmalloc(    (l), __func__, __FILE__, __LINE__)
 #define vcalloc(n,l) mem_vmalloc((n)*(l), __func__, __FILE__, __LINE__)
 void* mem_vmalloc(size_t, const char*, const char*, unsigned int);

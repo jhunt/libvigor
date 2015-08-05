@@ -28,6 +28,7 @@ core_src += src/list.c
 core_src += src/lock.c
 core_src += src/log.c
 core_src += src/mem.c
+core_src += src/meta.c
 core_src += src/mq.c
 core_src += src/path.c
 core_src += src/proc.c
