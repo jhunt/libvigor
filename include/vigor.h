@@ -550,10 +550,7 @@ void zap_shutdown(void *handle);
 
  */
 
-typedef struct {
-	list_t          reactors;
-	zmq_pollitem_t *poller;
-} reactor_t;
+typedef struct reactor_t reactor_t;
 typedef int (*reactor_fn)(void *socket, pdu_t *pdu, void *data);
 
 #define VIGOR_REACTOR_CONTINUE 0

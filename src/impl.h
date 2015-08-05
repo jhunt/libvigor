@@ -136,6 +136,11 @@ struct hb_t {
 	int    missed;
 };
 
+struct reactor_t {
+	list_t          reactors;
+	zmq_pollitem_t *poller;
+};
+
 struct ha_t {
 	int      state;
 	int      event;
