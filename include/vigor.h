@@ -146,10 +146,12 @@ list_t* list_pop  (list_t *l);
     ##    ##  ##     ## ##    ##  ##    ##  ##       ##    ##
     ##    ##  ##     ##  ######   ##    ##  ########  ######
  */
+#define VIGOR_HASH_DESTRUCTOR 1
 typedef struct hash_t hash_t;
+
 hash_t* hash_new(void);
 void hash_free(hash_t *h);
-int hash_set_free_fn(hash_t *h, void (*fn)(void *));
+int hash_setopt(hash_t *h, int op, const void *data, size_t len);
 
 void* hash_get(const hash_t *h, const char *k);
 void* hash_set(hash_t *h, const char *k, void *v);

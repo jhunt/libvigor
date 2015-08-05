@@ -91,7 +91,7 @@ void hash_free(hash_t *h)
 		for (i = 0; i < 64; i++) {
 			for (j = 0; j < h->entries[i].len; j++) {
 				free(h->entries[i].keys[j]);
-				if (h->free) (*h->free)(h->entries[i].values[j]);
+				if (h->free_f) (*h->free_f)(h->entries[i].values[j]);
 			}
 			free(h->entries[i].keys);
 			free(h->entries[i].values);
@@ -101,24 +101,38 @@ void hash_free(hash_t *h)
 }
 
 /**
-  Register a `free' function for the values in $h.
+  Set hash options.
 
-  This function will be called by hash_free(), and passed
-  each value that needs to be freed, in turn.  The following
-  call signature is required:
+  This function allows you to configure a hash, by specifying
+  a the destructor function (used to free values), and allow
+  for future extensibility.
 
-      void fn(void *value)
+  The following $op values are supported:
 
-  This makes it compatible with the standard free(3) call.
+  - **`VIGOR_HASH_DESTRUCTOR`** - A destructor function, used
+    for freeing memory of expired cache entries.
+
+    $data must be a function with the signature:
+
+        void fn(void *value)
+
+  The $data payload will be cast to the appropriate data type,
+  based on the given $op.
+
+  On success, returns 0.
+
+  On failure, returns 1, and sets errno appropriately:
+
+  - **`EINVAL`** - An unknown or unhandled $op value was specified.
  */
-int hash_set_free_fn(hash_t *h, void (*fn)(void *))
+int hash_setopt(hash_t *h, int op, const void *data, size_t len)
 {
+	if (op == VIGOR_HASH_DESTRUCTOR) {
+		h->free_f = data;
+		return 0;
+	}
 	errno = EINVAL;
-	if (!h)
-		return -1;
-
-	h->free = fn;
-	return 0;
+	return 1;
 }
 
 /**

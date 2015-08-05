@@ -69,7 +69,7 @@ TESTS {
 		char *value2 = strdup("value2");
 
 		isnt_null(h = hash_new(), "hash_new -> pointer");
-		ok(hash_set_free_fn(h, free) == 0, "set hash_free_fn callback");
+		ok(hash_setopt(h, VIGOR_HASH_DESTRUCTOR, free, 0) == 0, "set hash destructor");
 
 		ok(hash_set(h, "key", value1) == NULL, "first hash_set for overrides");
 		is_string(hash_get(h, "key"), value1, "hash_get of first value");

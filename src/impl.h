@@ -55,7 +55,7 @@ struct hash_t {
 	ssize_t         bucket;
 	ssize_t         offset;
 
-	void (*free)(void *);
+	void (*free_f)(void *);
 };
 
 struct keyval {

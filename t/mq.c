@@ -160,7 +160,7 @@ TESTS {
 	subtest { /* pdu_to_hash */
 		pdu_t *pdu;
 		hash_t *hash = hash_new();
-		hash_set_free_fn(hash, free);
+		hash_setopt(hash, VIGOR_HASH_DESTRUCTOR, free, 0);
 
 		pdu = pdu_make("SIMPLE", 6,
 			"key1", "value1",
