@@ -18,6 +18,7 @@
  */
 
 #include "test.h"
+#include "../src/impl.h"
 
 int global_counter = 0;
 void destroyer(void *d)

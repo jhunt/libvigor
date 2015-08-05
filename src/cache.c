@@ -55,7 +55,7 @@
 cache_t* cache_new(size_t len, int32_t expire)
 {
 	cache_t *cc  = vmalloc(sizeof(cache_t)
-	                     + sizeof(cache_entry_t) * len);
+	                     + sizeof(struct cachent) * len);
 	cc->max_len  = len;
 	cc->expire = expire;
 	cc->index = vmalloc(sizeof(hash_t));
@@ -204,7 +204,7 @@ static int s_cache_next(cache_t *cc)
  */
 void* cache_get(cache_t *cc, const char *id)
 {
-	cache_entry_t *ent = hash_get(cc->index, id);
+	struct cachent *ent = hash_get(cc->index, id);
 	if (!ent) return NULL;
 
 	int32_t now = time_s();
@@ -228,7 +228,7 @@ void* cache_get(cache_t *cc, const char *id)
  */
 void* cache_set(cache_t *cc, const char *id, void *data)
 {
-	cache_entry_t *ent = hash_get(cc->index, id);
+	struct cachent *ent = hash_get(cc->index, id);
 	if (ent && ent->data != data && cc->destroy_f)
 		(*cc->destroy_f)(ent->data);
 
@@ -256,7 +256,7 @@ void* cache_set(cache_t *cc, const char *id, void *data)
  */
 void* cache_unset(cache_t *cc, const char *id)
 {
-	cache_entry_t *ent = hash_get(cc->index, id);
+	struct cachent *ent = hash_get(cc->index, id);
 	if (!ent) return NULL;
 	hash_set(cc->index, id, NULL);
 
@@ -282,7 +282,7 @@ void* cache_unset(cache_t *cc, const char *id)
  */
 void cache_touch(cache_t *cc, const char *id, int32_t last)
 {
-	cache_entry_t *ent = hash_get(cc->index, id);
+	struct cachent *ent = hash_get(cc->index, id);
 	if (!ent) return;
 
 	if (last <= 0) last = time_s();
@@ -305,4 +305,14 @@ int cache_isempty(cache_t *cc)
 		if (cc->entries[i].ident)
 			return 0;
 	return 1;
+}
+
+void cache_iterator_init(cache_t *cc)
+{
+	hash_iterator_init(cc->index);
+}
+
+void* cache_iterator_next(cache_t *cc, char **k)
+{
+	return hash_iterator_next(cc->index, k, NULL);
 }

@@ -64,4 +64,21 @@ struct keyval {
 	list_t l;
 };
 
+struct cachent {
+	char    *ident;
+	int32_t  last_seen;
+	void    *data;
+};
+struct cache_t {
+	size_t  __reserved1__;
+	size_t  max_len;
+	int32_t expire;
+
+	void (*destroy_f)(void*);
+
+	hash_t         *index;
+	struct cachent  entries[];
+};
+
+
 #endif

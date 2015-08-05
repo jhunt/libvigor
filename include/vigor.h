@@ -195,26 +195,7 @@ void config_done(config_t *cfg);
 
 */
 
-typedef struct {
-	char    *ident;
-	int32_t  last_seen;
-	void    *data;
-} cache_entry_t;
-
-typedef struct {
-	size_t  __reserved1__;
-	size_t  max_len;
-	int32_t expire;
-
-	void (*destroy_f)(void*);
-
-	hash_t        *index;
-	cache_entry_t  entries[];
-} cache_t;
-
-#define for_each_cache_key(cc,k) \
-	for (hash_iterator_init((cc)->index); \
-	     hash_iterator_next((cc)->index, &(k), NULL); )
+typedef struct cache_t cache_t;
 
 #define VIGOR_CACHE_DESTRUCTOR 1
 #define VIGOR_CACHE_EXPIRY     2
@@ -230,6 +211,13 @@ void* cache_unset(cache_t *cc, const char *id);
 void cache_touch(cache_t *cc, const char *id, int32_t last);
 int cache_isfull(cache_t *cc);
 int cache_isempty(cache_t *cc);
+
+void  cache_iterator_init(cache_t *cc);
+void* cache_iterator_next(cache_t *cc, char **k);
+
+#define for_each_cache_key(cc,k) \
+	for (cache_iterator_init(cc); \
+	     cache_iterator_next((cc), &(k)); )
 
 /*
      ######  ######## ########  #### ##    ##  ######    ######
