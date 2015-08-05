@@ -91,4 +91,10 @@ struct lock_t {
 	int32_t time;
 };
 
+struct path_t {
+	char     *buf;
+	ssize_t   n;
+	size_t    len;
+};
+
 #endif

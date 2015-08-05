@@ -383,11 +383,7 @@ char* base16_decodestr(const char *src, size_t len);
 
  */
 
-typedef struct {
-	char     *buf;
-	ssize_t   n;
-	size_t    len;
-} path_t;
+typedef struct path_t path_t;
 
 path_t* path_new(const char *p);
 void path_free(path_t *p);
