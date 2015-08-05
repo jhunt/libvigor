@@ -367,7 +367,7 @@ int trustdb_writeio(trustdb_t *ca, FILE *io)
 	assert(ca);
 	assert(io);
 
-	keyval_t *kv;
+	struct keyval *kv;
 	for_each_object(kv, &ca->certs, l)
 		if (kv->val)
 			fprintf(io, "%s %s\n", kv->key, kv->val);

@@ -46,7 +46,7 @@ int config_set(config_t *cfg, const char *key, const char *val)
 	assert(key);
 	assert(val);
 
-	keyval_t *kv;
+	struct keyval *kv;
 	for_each_object(kv, cfg, l) {
 		if (strcmp(kv->key, key) != 0)
 			continue;
@@ -55,7 +55,7 @@ int config_set(config_t *cfg, const char *key, const char *val)
 		return 0;
 	}
 
-	kv = malloc(sizeof(keyval_t));
+	kv = malloc(sizeof(struct keyval));
 	assert(kv);
 
 	kv->key = strdup(key);
@@ -76,7 +76,7 @@ int config_unset(config_t *cfg, const char *key)
 	assert(cfg);
 	assert(key);
 
-	keyval_t *kv, *tmp;
+	struct keyval *kv, *tmp;
 	for_each_object_safe(kv, tmp, cfg, l) {
 		if (strcmp(kv->key, key) != 0)
 			continue;
@@ -99,7 +99,7 @@ char * config_get(config_t *cfg, const char *key)
 	assert(cfg);
 	assert(key);
 
-	keyval_t *kv;
+	struct keyval *kv;
 	for_each_object(kv, cfg, l)
 		if (strcmp(kv->key, key) == 0)
 			return kv->val;
@@ -117,7 +117,7 @@ int config_isset(config_t *cfg, const char *key)
 	assert(cfg);
 	assert(key);
 
-	keyval_t *kv;
+	struct keyval *kv;
 	for_each_object(kv, cfg, l)
 		if (strcmp(kv->key, key) == 0)
 			return 1;
@@ -139,7 +139,7 @@ int config_read(config_t *cfg, FILE *io)
 	assert(cfg);
 	assert(io);
 
-	keyval_t *kv;
+	struct keyval *kv;
 	char line[8192];
 	while (fgets(line, 8191, io)) {
 		/* FIXME: doesn't handle large lines (>8192) */
@@ -172,7 +172,7 @@ int config_read(config_t *cfg, FILE *io)
 		if (*a == '#') continue;
 		if (*a == '\n') continue;
 
-		kv = malloc(sizeof(keyval_t));
+		kv = malloc(sizeof(struct keyval));
 		assert(kv);
 		kv->key = strdup(a);
 		kv->val = strdup(c);
@@ -194,7 +194,7 @@ int config_write(config_t *cfg, FILE *io)
 {
 	CONFIG(uniq);
 
-	keyval_t *kv;
+	struct keyval *kv;
 	for_each_object(kv, cfg, l) {
 		if (!config_isset(&uniq, kv->key)) {
 			config_set(&uniq, kv->key, kv->val);
@@ -216,7 +216,7 @@ void config_done(config_t *cfg)
 {
 	assert(cfg);
 
-	keyval_t *kv, *tmp;
+	struct keyval *kv, *tmp;
 	for_each_object_safe(kv, tmp, cfg, l) {
 		free(kv->key);
 		free(kv->val);
