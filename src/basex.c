@@ -193,7 +193,7 @@ char* base16_encodestr(const void *src, size_t len)
 	if (len <= 0) return NULL;
 
 	size_t dlen = len * 2;
-	char *dst = vmalloc(sizeof(char) * (dlen + 1));
+	char *dst = vcalloc(dlen + 1, sizeof(char));
 
 	int rc = base16_encode(dst, dlen, src, len);
 	if (rc < 0) {
@@ -233,7 +233,7 @@ char* base16_decodestr(const char *src, size_t len)
 	if (len <= 0) return NULL;
 
 	size_t dlen = len / 2;
-	char *dst = vmalloc(sizeof(char) * (dlen + 1));
+	char *dst = vcalloc(dlen + 1, sizeof(char));
 
 	int rc = base16_decode(dst, dlen, src, len);
 	if (rc < 0) {

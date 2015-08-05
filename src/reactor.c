@@ -42,7 +42,7 @@ typedef struct {
 
 reactor_t *reactor_new(void)
 {
-	reactor_t *r = vmalloc(sizeof(reactor_t));
+	reactor_t *r = vnew(reactor_t);
 	list_init(&r->reactors);
 	return r;
 }
@@ -64,7 +64,7 @@ int reactor_set(reactor_t *r, void *socket, reactor_fn fn, void *data)
 	assert(socket);
 	assert(fn);
 
-	reactor_item_t *item = vmalloc(sizeof(reactor_item_t));
+	reactor_item_t *item = vnew(reactor_item_t);
 	list_init(&item->l);
 	item->socket = socket;
 	item->fn     = fn;

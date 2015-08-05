@@ -55,7 +55,7 @@ frame_t* s_frame_new(const void *buf, size_t len, uint8_t flags)
 	assert(buf);
 	assert(len >= 0);
 
-	frame_t *f = vmalloc(sizeof(frame_t));
+	frame_t *f = vnew(frame_t);
 	list_init(&f->l);
 
 	int rc = zmq_msg_init_size(&f->msg, len);
@@ -83,7 +83,7 @@ static frame_t* s_frame_recv(void *zocket)
 {
 	assert(zocket);
 
-	frame_t *f = vmalloc(sizeof(frame_t));
+	frame_t *f = vnew(frame_t);
 	list_init(&f->l);
 
 	int rc = zmq_msg_init(&f->msg);
@@ -259,7 +259,7 @@ int vzmq_connect_af(void *z, const char *endpoint, int af)
 
 pdu_t* pdu_new(void)
 {
-	pdu_t *p = vmalloc(sizeof(pdu_t));
+	pdu_t *p = vnew(pdu_t);
 	list_init(&p->frames);
 
 	return p;
@@ -695,7 +695,7 @@ void* zap_startup(void *zctx, trustdb_t *tdb)
 {
 	assert(zctx);
 
-	zap_t *handle = vmalloc(sizeof(zap_t));
+	zap_t *handle = vnew(zap_t);
 	handle->tdb = tdb;
 
 	handle->socket = zmq_socket(zctx, ZMQ_REP);

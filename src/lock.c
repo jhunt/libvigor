@@ -50,7 +50,7 @@ static int s_lock_details(lock_t *lock)
 
 lock_t *lock_new(const char *path)
 {
-	lock_t *lock = vmalloc(sizeof(lock_t));
+	lock_t *lock = vnew(lock_t);
 	lock->path  = path;
 	lock->valid =  0;
 	lock->fd    = -1;

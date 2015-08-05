@@ -74,7 +74,7 @@ static int s_hash_insert(struct hash_bkt *b, const char *k, void *v)
  */
 hash_t *hash_new(void)
 {
-	return vmalloc(sizeof(hash_t));
+	return vnew(hash_t);
 }
 
 /**

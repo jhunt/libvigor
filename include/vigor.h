@@ -46,8 +46,9 @@
 
 void vigor_version(int *maj, int *min, int *rev);
 
-#define vmalloc(l)   mem_vmalloc(    (l), __func__, __FILE__, __LINE__)
-#define vcalloc(n,l) mem_vmalloc((n)*(l), __func__, __FILE__, __LINE__)
+#define vnew(t)      mem_vmalloc(sizeof(t), __func__, __FILE__, __LINE__)
+#define vmalloc(l)   mem_vmalloc(      (l), __func__, __FILE__, __LINE__)
+#define vcalloc(n,l) mem_vmalloc((n) * (l), __func__, __FILE__, __LINE__)
 void* mem_vmalloc(size_t, const char*, const char*, unsigned int);
 #if VIGOR_MEM_TRACE
 #  include <mcheck.h>

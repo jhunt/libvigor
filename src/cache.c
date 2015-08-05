@@ -58,7 +58,7 @@ cache_t* cache_new(size_t len, int32_t expire)
 	                     + sizeof(struct cachent) * len);
 	cc->max_len  = len;
 	cc->expire = expire;
-	cc->index = vmalloc(sizeof(hash_t));
+	cc->index = vnew(hash_t);
 	return cc;
 }
 

@@ -21,7 +21,7 @@ cert_t* cert_new(int type)
 	 && type != VIGOR_CERT_SIGNING)
 		return NULL;
 
-	cert_t *key = vmalloc(sizeof(cert_t));
+	cert_t *key = vnew(cert_t);
 	key->type = type;
 	return key;
 }
@@ -317,7 +317,7 @@ int cert_sealed(cert_t *k, const void *_s, unsigned long long slen)
 
 trustdb_t* trustdb_new(void)
 {
-	trustdb_t *ca = vmalloc(sizeof(trustdb_t));
+	trustdb_t *ca = vnew(trustdb_t);
 	ca->verify = 1;
 	list_init(&ca->certs);
 	return ca;
