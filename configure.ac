@@ -1,4 +1,4 @@
-AC_INIT([libvigor], [1.2.7], [bugs@niftylogic.com])
+AC_INIT([libvigor], [2.0.0], [bugs@niftylogic.com])
 AC_PREREQ(2.63)
 AC_CONFIG_SRCDIR([include/vigor.h])
 AC_CONFIG_AUX_DIR([build])
