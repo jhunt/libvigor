@@ -514,13 +514,7 @@ int trustdb_verify(trustdb_t *ca, cert_t *key, const char *ident);
 
 */
 
-typedef struct {
-	void   *address;
-	char   *peer;
-	char   *type;
-	int     len;
-	list_t  frames;
-} pdu_t;
+typedef struct pdu_t pdu_t;
 
 void* vzmq_ident(void *zocket, void *id);
 void vzmq_shutdown(void *zocket, int linger);
@@ -534,7 +528,7 @@ pdu_t* pdu_reply(pdu_t *p, const char *type, size_t n, ...);
 pdu_t* pdu_dup(pdu_t *from, const char *type);
 void pdu_free(pdu_t *p);
 
-#define pdu_size(p) ((p)->len)
+int pdu_size(pdu_t *p);
 char* pdu_peer(pdu_t *p);
 char* pdu_type(pdu_t *p);
 int pdu_attn(pdu_t *p, const char *peer);

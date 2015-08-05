@@ -18,6 +18,7 @@
  */
 
 #include "test.h"
+#include "../src/impl.h"
 
 #define LOOPBACK "tcp://127.0.0.1:1026"
 

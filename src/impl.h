@@ -97,4 +97,12 @@ struct path_t {
 	size_t    len;
 };
 
+struct pdu_t {
+	void   *address;
+	char   *peer;
+	char   *type;
+	int     len;
+	list_t  frames;
+};
+
 #endif

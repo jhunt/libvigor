@@ -317,6 +317,11 @@ pdu_t *pdu_dup(pdu_t *from, const char *type)
 	return to;
 }
 
+int pdu_size(pdu_t *p)
+{
+	return p->len;
+}
+
 char* pdu_peer(pdu_t *p)
 {
 	if (!p->peer && p->address) {
