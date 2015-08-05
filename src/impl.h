@@ -58,4 +58,10 @@ struct hash_t {
 	void (*free)(void *);
 };
 
+struct keyval {
+	char *key;
+	char *val;
+	list_t l;
+};
+
 #endif

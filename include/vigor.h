@@ -171,13 +171,8 @@ void* hash_iterator_next(hash_t *h, char **k, void **v);
      ######   #######  ##    ## ##       ####  ######
  */
 
-#define config_t list_t
+typedef list_t config_t;
 typedef struct keyval keyval_t;
-struct keyval {
-	char *key;
-	char *val;
-	list_t l;
-};
 
 #define CONFIG(n) config_t n = { &(n), &(n) }
 int config_set  (config_t *cfg, const char *key, const char *val);
