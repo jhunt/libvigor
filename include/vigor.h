@@ -449,23 +449,8 @@ void seed_randomness(void);
 #define VIGOR_CERT_ENCRYPTION 0
 #define VIGOR_CERT_SIGNING    1
 
-typedef struct {
-	char   *ident;
-	int     type;
-
-	int     pubkey;
-	uint8_t pubkey_bin[32];
-	uint8_t seckey_bin[64];
-
-	int     seckey;
-	char    pubkey_b16[65];
-	char    seckey_b16[129];
-} cert_t;
-
-typedef struct {
-	int     verify;
-	list_t  certs;
-} trustdb_t;
+typedef struct cert_t cert_t;
+typedef struct trustdb_t trustdb_t;
 
 cert_t* cert_new(int type);
 cert_t* cert_make(int type, const char *pub, const char *sec);

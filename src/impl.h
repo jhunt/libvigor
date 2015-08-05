@@ -105,4 +105,22 @@ struct pdu_t {
 	list_t  frames;
 };
 
+struct cert_t {
+	char   *ident;
+	int     type;
+
+	int     pubkey;
+	uint8_t pubkey_bin[32];
+	uint8_t seckey_bin[64];
+
+	int     seckey;
+	char    pubkey_b16[65];
+	char    seckey_b16[129];
+};
+
+struct trustdb_t {
+	int     verify;
+	list_t  certs;
+};
+
 #endif
