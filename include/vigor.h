@@ -146,26 +146,20 @@ list_t* list_pop  (list_t *l);
     ##    ##  ##     ## ##    ##  ##    ##  ##       ##    ##
     ##    ##  ##     ##  ######   ##    ##  ########  ######
  */
-typedef struct hash hash_t;
-struct hash_bkt {
-	size_t   len;
-	char   **keys;
-	char   **values;
-};
-struct hash {
-	struct hash_bkt entries[64];
-	ssize_t         bucket;
-	ssize_t         offset;
-};
-void hash_done(hash_t *h, uint8_t all);
+typedef struct hash_t hash_t;
+hash_t* hash_new(void);
+void hash_free(hash_t *h);
+int hash_set_free_fn(hash_t *h, void (*fn)(void *));
+
 void* hash_get(const hash_t *h, const char *k);
 void* hash_set(hash_t *h, const char *k, void *v);
-void* hash_next(hash_t *h, char **k, void **v);
 void hash_merge(hash_t *a, hash_t *b);
 
+void  hash_iterator_init(hash_t *h);
+void* hash_iterator_next(hash_t *h, char **k, void **v);
 #define for_each_key_value(h,k,v) \
-	for ((h)->offset = (h)->bucket = 0; \
-	     hash_next((h), &(k), (void**)&(v)); )
+	for (hash_iterator_init((h)); \
+	     hash_iterator_next((h), &(k), (void**)&(v)); )
 
 /*
      ######   #######  ##    ## ######## ####  ######
@@ -219,13 +213,13 @@ typedef struct {
 
 	void (*destroy_f)(void*);
 
-	hash_t      index;
+	hash_t        *index;
 	cache_entry_t  entries[];
 } cache_t;
 
 #define for_each_cache_key(cc,k) \
-	for ((cc)->index.offset = (cc)->index.bucket = 0; \
-	     hash_next(&(cc)->index, &(k), NULL); )
+	for (hash_iterator_init((cc)->index); \
+	     hash_iterator_next((cc)->index, &(k), NULL); )
 
 #define VIGOR_CACHE_DESTRUCTOR 1
 #define VIGOR_CACHE_EXPIRY     2

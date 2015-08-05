@@ -45,4 +45,17 @@
 
 #include <sodium.h>
 
+struct hash_bkt {
+	size_t   len;
+	char   **keys;
+	char   **values;
+};
+struct hash_t {
+	struct hash_bkt entries[64];
+	ssize_t         bucket;
+	ssize_t         offset;
+
+	void (*free)(void *);
+};
+
 #endif

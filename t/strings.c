@@ -58,7 +58,7 @@ TESTS {
 			{ NULL, NULL }
 		};
 
-		isnt_null(vars = vmalloc(sizeof(hash_t)), "created a hash for vars");
+		isnt_null(vars = hash_new(), "created a hash for vars");
 		if (!vars) break;
 
 		hash_set(vars, "ref1", "this is a reference");
@@ -73,8 +73,7 @@ TESTS {
 			free(buf);
 		}
 
-		hash_done(vars, 0);
-		free(vars);
+		hash_free(vars);
 	}
 
 	subtest {

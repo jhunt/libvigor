@@ -158,40 +158,39 @@ TESTS {
 
 	subtest { /* pdu_to_hash */
 		pdu_t *pdu;
-		hash_t hash;
-		memset(&hash, 0, sizeof(hash));
+		hash_t *hash = hash_new();
+		hash_set_free_fn(hash, free);
 
 		pdu = pdu_make("SIMPLE", 6,
 			"key1", "value1",
 			"key2", "second value",
 			"KeY3", "value III");
 
-		ok(pdu_to_hash(pdu, &hash, 2) != 0,
+		ok(pdu_to_hash(pdu, hash, 2) != 0,
 			"failed to create hash from bad PDU (offset)");
 
-		is_null(hash_get(&hash, "key1"), "key1 not set");
-		is_null(hash_get(&hash, "key2"), "key2 not set");
-		is_null(hash_get(&hash, "KeY3"), "KeY3 not set");
+		is_null(hash_get(hash, "key1"), "key1 not set");
+		is_null(hash_get(hash, "key2"), "key2 not set");
+		is_null(hash_get(hash, "KeY3"), "KeY3 not set");
 
-		ok(pdu_to_hash(pdu, &hash, 1) == 0, "created hash from PDU");
-		is(hash_get(&hash, "key1"), "value1",       "key1 set");
-		is(hash_get(&hash, "key2"), "second value", "key2 set");
-		is(hash_get(&hash, "KeY3"), "value III",    "KeY3 set");
+		ok(pdu_to_hash(pdu, hash, 1) == 0, "created hash from PDU");
+		is(hash_get(hash, "key1"), "value1",       "key1 set");
+		is(hash_get(hash, "key2"), "second value", "key2 set");
+		is(hash_get(hash, "KeY3"), "value III",    "KeY3 set");
 
 		pdu_free(pdu);
-		hash_done(&hash, 1);
+		hash_free(hash);
 	}
 
 	subtest { /* hash_to_pdu */
 		pdu_t *pdu;
-		hash_t hash;
-		memset(&hash, 0, sizeof(hash));
+		hash_t *hash = hash_new();
 
 		pdu = pdu_make("SIMPLE", 3, "extra", "header", "fields");
-		hash_set(&hash, "uuid", "DEADBEEF");
-		hash_set(&hash, "type", "worker");
+		hash_set(hash, "uuid", "DEADBEEF");
+		hash_set(hash, "type", "worker");
 
-		ok(pdu_from_hash(pdu, &hash) == 0, "extended PDU from hash");
+		ok(pdu_from_hash(pdu, hash) == 0, "extended PDU from hash");
 		char *s;
 		is(s = pdu_string(pdu, 1), "extra",    "PDU[1] == 'extra'");    free(s);
 		is(s = pdu_string(pdu, 2), "header",   "PDU[2] == 'header'");   free(s);
@@ -202,7 +201,7 @@ TESTS {
 		is(s = pdu_string(pdu, 7), "worker",   "PDU[7] == 'worker'");   free(s);
 
 		pdu_free(pdu);
-		hash_done(&hash, 0);
+		hash_free(hash);
 	}
 
 	subtest { /* vzmq_ident */

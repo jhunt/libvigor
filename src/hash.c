@@ -70,27 +70,55 @@ static int s_hash_insert(struct hash_bkt *b, const char *k, void *v)
  */
 
 /**
+  Allocate a new hash structure.
+ */
+hash_t *hash_new(void)
+{
+	return vmalloc(sizeof(hash_t));
+}
+
+/**
   Release memory allocated to hash $h.
 
-  If the $all parameter is non-zero, values stored in the hash
-  will be freed as well.
-
-  Note that this does not free the memory that $h resides in;
-  this allows the hash_t object to be stack-allocated.
+  If a free function has been set (by hash_set_free_fn), it
+  will be called for each value found in the hash, to free
+  the memory occuped there.
  */
-void hash_done(hash_t *h, uint8_t all)
+void hash_free(hash_t *h)
 {
 	ssize_t i, j;
 	if (h) {
 		for (i = 0; i < 64; i++) {
 			for (j = 0; j < h->entries[i].len; j++) {
 				free(h->entries[i].keys[j]);
-				if (all) free(h->entries[i].values[j]);
+				if (h->free) (*h->free)(h->entries[i].values[j]);
 			}
 			free(h->entries[i].keys);
 			free(h->entries[i].values);
 		}
 	}
+	free(h);
+}
+
+/**
+  Register a `free' function for the values in $h.
+
+  This function will be called by hash_free(), and passed
+  each value that needs to be freed, in turn.  The following
+  call signature is required:
+
+      void fn(void *value)
+
+  This makes it compatible with the standard free(3) call.
+ */
+int hash_set_free_fn(hash_t *h, void (*fn)(void *))
+{
+	errno = EINVAL;
+	if (!h)
+		return -1;
+
+	h->free = fn;
+	return 0;
 }
 
 /**
@@ -125,7 +153,7 @@ void* hash_set(hash_t *h, const char *k, void *v)
 
 	if (i < 0) {
 		s_hash_insert(b, k, v);
-		return v;
+		return NULL;
 	}
 
 	void *existing = b->values[i];
@@ -134,7 +162,15 @@ void* hash_set(hash_t *h, const char *k, void *v)
 }
 
 /* internal use; external visibility for macro loops */
-void* hash_next(hash_t *h, char **k, void **v)
+void hash_iterator_init(hash_t *h)
+{
+	assert(h); // LCOV_EXCL_LINE;
+
+	h->offset = h->bucket = 0;
+}
+
+/* internal use; external visibility for macro loops */
+void* hash_iterator_next(hash_t *h, char **k, void **v)
 {
 	assert(h); // LCOV_EXCL_LINE
 

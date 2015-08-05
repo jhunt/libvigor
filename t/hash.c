@@ -26,19 +26,18 @@ TESTS {
 		char *path = strdup("/some/path/some/where");
 		char *name = strdup("staff");
 
-		isnt_null(h = vmalloc(sizeof(hash_t)), "hash_new -> pointer");
+		isnt_null(h = hash_new(), "hash_new -> pointer");
 
 		is_null(hash_get(h, "path"), "can't get 'path' prior to set");
 		is_null(hash_get(h, "name"), "can't get 'name' prior to set");
 
-		ok(hash_set(h, "path", path) == path, "set h.path");
-		ok(hash_set(h, "name", name) == name, "set h.name");
+		ok(hash_set(h, "path", path) == NULL, "set h.path");
+		ok(hash_set(h, "name", name) == NULL, "set h.name");
 
 		is_string(hash_get(h, "path"), path, "get h.path");
 		is_string(hash_get(h, "name"), name, "get h.name");
 
-		hash_done(h, 0);
-		free(h);
+		hash_free(h);
 		free(path);
 		free(name);
 	}
@@ -48,19 +47,18 @@ TESTS {
 		char *path  = strdup("/some/path/some/where");
 		char *group = strdup("staff");
 
-		isnt_null(h = vmalloc(sizeof(hash_t)), "hash_new -> pointer");
+		isnt_null(h = hash_new(), "hash_new -> pointer");
 
 		is_null(hash_get(h, "path"),  "get h.path (initially null)");
 		is_null(hash_get(h, "group"), "get h.group (initially null)");
 
-		ok(hash_set(h, "path",  path)  == path,  "set h.path");
-		ok(hash_set(h, "group", group) == group, "set h.group");
+		ok(hash_set(h, "path",  path)  == NULL,  "set h.path");
+		ok(hash_set(h, "group", group) == NULL, "set h.group");
 
 		is_string(hash_get(h, "path"),  path,  "get h.path");
 		is_string(hash_get(h, "group"), group, "get h.group");
 
-		hash_done(h, 0);
-		free(h);
+		hash_free(h);
 		free(path);
 		free(group);
 	}
@@ -70,17 +68,17 @@ TESTS {
 		char *value1 = strdup("value1");
 		char *value2 = strdup("value2");
 
-		isnt_null(h = vmalloc(sizeof(hash_t)), "hash_new -> pointer");
+		isnt_null(h = hash_new(), "hash_new -> pointer");
+		ok(hash_set_free_fn(h, free) == 0, "set hash_free_fn callback");
 
-		ok(hash_set(h, "key", value1) == value1, "first hash_set for overrides");
+		ok(hash_set(h, "key", value1) == NULL, "first hash_set for overrides");
 		is_string(hash_get(h, "key"), value1, "hash_get of first value");
 
 		// hash_set returns previous value on override
 		ok(hash_set(h, "key", value2) == value1, "second hash_set for overrides");
 		is_string(hash_get(h, "key"), value2, "hash_get of second value");
 
-		hash_done(h, 1);
-		free(h);
+		hash_free(h);
 		free(value1);
 	}
 
@@ -89,16 +87,15 @@ TESTS {
 
 		is_null(hash_get(NULL, "test"), "hash_get NULL hash");
 
-		isnt_null(h = vmalloc(sizeof(hash_t)), "hash_new -> pointer");
+		isnt_null(h = hash_new(), "hash_new -> pointer");
 		hash_set(h, "test", "valid");
 
 		is_null(hash_get(h, NULL), "hash_get NULL key");
-		hash_done(h, 0);
-		free(h);
+		hash_free(h);
 	}
 
 	subtest {
-		hash_t *h = vmalloc(sizeof(hash_t));
+		hash_t *h = hash_new();
 		char *key, *value;
 
 		int saw_promise = 0;
@@ -132,8 +129,7 @@ TESTS {
 				fail("Unexpected value found during for_each_key_value");
 			}
 		}
-		hash_done(h, 0);
-		free(h);
+		hash_free(h);
 
 		is_int(saw_promise, 1, "saw the promise key only once");
 		is_int(saw_snooze,  1, "saw the snooze key only once");
@@ -142,53 +138,51 @@ TESTS {
 	}
 
 	subtest {
-		hash_t a, b;
-		memset(&a, 0, sizeof(a));
-		memset(&b, 0, sizeof(b));
+		hash_t *a = hash_new();
+		hash_t *b = hash_new();;
 
-		hash_set(&a, "only-in-a", "this value");
-		hash_set(&a, "common",    "shared from A");
-		is_string(hash_get(&a, "only-in-a"), "this value",    "only-in-a == 'this value'");
-		is_string(hash_get(&a, "common"),    "shared from A", "common    == 'shared from A'");
-		is_null(hash_get(&a, "only-in-b"), "only-in-b not set in A pre-merge");
+		hash_set(a, "only-in-a", "this value");
+		hash_set(a, "common",    "shared from A");
+		is_string(hash_get(a, "only-in-a"), "this value",    "only-in-a == 'this value'");
+		is_string(hash_get(a, "common"),    "shared from A", "common    == 'shared from A'");
+		is_null(hash_get(a, "only-in-b"), "only-in-b not set in A pre-merge");
 
-		hash_set(&b, "only-in-b", "that value");
-		hash_set(&b, "common",    "shared from B");
-		is_string(hash_get(&b, "only-in-b"), "that value",    "only-in-b == 'that value'");
-		is_string(hash_get(&b, "common"),    "shared from B", "common    == 'shared from B'");
-		is_null(hash_get(&b, "only-in-a"), "only-in-a not set in B pre-merge");
+		hash_set(b, "only-in-b", "that value");
+		hash_set(b, "common",    "shared from B");
+		is_string(hash_get(b, "only-in-b"), "that value",    "only-in-b == 'that value'");
+		is_string(hash_get(b, "common"),    "shared from B", "common    == 'shared from B'");
+		is_null(hash_get(b, "only-in-a"), "only-in-a not set in B pre-merge");
 
-		hash_merge(&a, &b);
-		is_string(hash_get(&a, "only-in-a"), "this value",    "only-in-a == 'this value'");
-		is_string(hash_get(&a, "only-in-b"), "that value",    "only-in-b == 'that value'");
-		is_string(hash_get(&a, "common"),    "shared from B", "common    == 'shared from B'");
+		hash_merge(a, b);
+		is_string(hash_get(a, "only-in-a"), "this value",    "only-in-a == 'this value'");
+		is_string(hash_get(a, "only-in-b"), "that value",    "only-in-b == 'that value'");
+		is_string(hash_get(a, "common"),    "shared from B", "common    == 'shared from B'");
 
-		hash_done(&a, 0);
-		hash_done(&b, 0);
+		hash_free(a);
+		hash_free(b);
 	}
 
 	subtest {
-		hash_t h;
-		memset(&h, 0, sizeof(h));
+		hash_t *h = hash_new();
 
 		char key[4096];
 		memset(key, '.', 4096);
 		key[0] = 'A';
 		key[4095] = 'Z';
 
-		hash_set(&h, key, "some value");
+		hash_set(h, key, "some value");
 		char *k, *v;
 
-		ok(hash_get(&h, key), "retrieved 4kb key");
+		ok(hash_get(h, key), "retrieved 4kb key");
 		size_t n = 0;
-		for_each_key_value(&h, k, v) {
+		for_each_key_value(h, k, v) {
 			n++;
 			is_string(k, key, "retrieved full key from keyval traversal");
 			is_string(v, "some value", "retrieved value");
 		}
 		is_int(n, 1, "only found one key/value");
 
-		hash_done(&h, 0);
+		hash_free(h);
 	}
 
 	alarm(0);

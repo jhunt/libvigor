@@ -58,7 +58,7 @@ cache_t* cache_new(size_t len, int32_t expire)
 	                     + sizeof(cache_entry_t) * len);
 	cc->max_len  = len;
 	cc->expire = expire;
-	memset(&cc->index, 0, sizeof(hash_t));
+	cc->index = vmalloc(sizeof(hash_t));
 	return cc;
 }
 
@@ -87,8 +87,8 @@ int cache_resize(cache_t **cc, size_t len)
 		cache_t *new = cache_new(len, (*cc)->expire);
 
 		char *k; void *v;
-		for_each_key_value(&(*cc)->index, k, v)
-			hash_set(&new->index, k, v);
+		for_each_key_value((*cc)->index, k, v)
+			hash_set(new->index, k, v);
 
 		new->destroy_f = (*cc)->destroy_f;
 		cache_free((*cc));
@@ -108,7 +108,7 @@ void cache_free(cache_t *cc)
 	if (!cc) return;
 
 	cache_purge(cc, 1);
-	hash_done(&cc->index, 0);
+	hash_free(cc->index);
 	free(cc);
 }
 
@@ -134,7 +134,7 @@ void cache_purge(cache_t *cc, int force)
 			continue;
 
 		if (cc->entries[i].ident) {
-			hash_set(&cc->index, cc->entries[i].ident, NULL);
+			hash_set(cc->index, cc->entries[i].ident, NULL);
 
 			free(cc->entries[i].ident);
 			cc->entries[i].ident = NULL;
@@ -204,7 +204,7 @@ static int s_cache_next(cache_t *cc)
  */
 void* cache_get(cache_t *cc, const char *id)
 {
-	cache_entry_t *ent = hash_get(&cc->index, id);
+	cache_entry_t *ent = hash_get(cc->index, id);
 	if (!ent) return NULL;
 
 	int32_t now = time_s();
@@ -228,7 +228,7 @@ void* cache_get(cache_t *cc, const char *id)
  */
 void* cache_set(cache_t *cc, const char *id, void *data)
 {
-	cache_entry_t *ent = hash_get(&cc->index, id);
+	cache_entry_t *ent = hash_get(cc->index, id);
 	if (ent && ent->data != data && cc->destroy_f)
 		(*cc->destroy_f)(ent->data);
 
@@ -239,7 +239,7 @@ void* cache_set(cache_t *cc, const char *id, void *data)
 	}
 	if (!ent->ident) {
 		ent->ident = strdup(id);
-		hash_set(&cc->index, id, ent);
+		hash_set(cc->index, id, ent);
 	}
 	ent->last_seen = time_s();
 	return ent->data = data;
@@ -256,9 +256,9 @@ void* cache_set(cache_t *cc, const char *id, void *data)
  */
 void* cache_unset(cache_t *cc, const char *id)
 {
-	cache_entry_t *ent = hash_get(&cc->index, id);
+	cache_entry_t *ent = hash_get(cc->index, id);
 	if (!ent) return NULL;
-	hash_set(&cc->index, id, NULL);
+	hash_set(cc->index, id, NULL);
 
 	free(ent->ident);
 	ent->ident = NULL;
@@ -282,7 +282,7 @@ void* cache_unset(cache_t *cc, const char *id)
  */
 void cache_touch(cache_t *cc, const char *id, int32_t last)
 {
-	cache_entry_t *ent = hash_get(&cc->index, id);
+	cache_entry_t *ent = hash_get(cc->index, id);
 	if (!ent) return;
 
 	if (last <= 0) last = time_s();
