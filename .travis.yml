@@ -1,0 +1,8 @@
+# travis ci
+
+language: c
+
+os:
+  - linux
+
+script: ./ci build

@@ -51,83 +51,83 @@ CTAP_TESTS =
 
 CTAP_TESTS += t/basex
 t_basex_SOURCES = t/basex.c t/test.h
-t_basex_LDFLAGS = libvigor.la
+t_basex_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/cache
 t_cache_SOURCES = t/cache.c t/test.h
-t_cache_LDFLAGS = libvigor.la
+t_cache_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/cert
 t_cert_SOURCES = t/cert.c t/test.h
-t_cert_LDFLAGS = libvigor.la
+t_cert_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/config
 t_config_SOURCES = t/config.c t/test.h
-t_config_LDFLAGS = libvigor.la
+t_config_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/ha
 t_ha_SOURCES = t/ha.c t/test.h
-t_ha_LDFLAGS = libvigor.la
+t_ha_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/hash
 t_hash_SOURCES = t/hash.c t/test.h
-t_hash_LDFLAGS = libvigor.la
+t_hash_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/hb
 t_hb_SOURCES = t/hb.c t/test.h
-t_hb_LDFLAGS = libvigor.la
+t_hb_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/list
 t_list_SOURCES = t/list.c t/test.h
-t_list_LDFLAGS = libvigor.la
+t_list_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/lock
 t_lock_SOURCES = t/lock.c t/test.h
-t_lock_LDFLAGS = libvigor.la
+t_lock_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/log
 t_log_SOURCES = t/log.c t/test.h
-t_log_LDFLAGS = libvigor.la
+t_log_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/mem
 t_mem_SOURCES = t/mem.c t/test.h
-t_mem_LDFLAGS = libvigor.la
+t_mem_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/mq
 t_mq_SOURCES = t/mq.c t/test.h
-t_mq_LDFLAGS = libvigor.la
+t_mq_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/path
 t_path_SOURCES = t/path.c t/test.h
-t_path_LDFLAGS = libvigor.la
+t_path_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/proc
 t_proc_SOURCES = t/proc.c t/test.h
-t_proc_LDFLAGS = libvigor.la
+t_proc_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/reactor
 t_reactor_SOURCES = t/reactor.c t/test.h
-t_reactor_LDFLAGS = libvigor.la
+t_reactor_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/run
 t_run_SOURCES = t/run.c t/test.h
-t_run_LDFLAGS = libvigor.la
+t_run_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/sha1
 t_sha1_SOURCES = t/sha1.c t/test.h
-t_sha1_LDFLAGS = libvigor.la
+t_sha1_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/signals
 t_signals_SOURCES = t/signals.c t/test.h
-t_signals_LDFLAGS = libvigor.la
+t_signals_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/strings
 t_strings_SOURCES = t/strings.c t/test.h
-t_strings_LDFLAGS = libvigor.la
+t_strings_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 CTAP_TESTS += t/time
 t_time_SOURCES = t/time.c t/test.h
-t_time_LDFLAGS = libvigor.la
+t_time_LDFLAGS = libvigor.la $(ctap_LIBS)
 
 TESTS          = $(CTAP_TESTS) t/memcheck
 BUILT_TESTS    = $(CTAP_TESTS)
