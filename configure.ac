@@ -14,10 +14,11 @@ AC_PROG_INSTALL
 # so we use the ifndef trick here to expand if expandable.
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
+PKG_PROG_PKG_CONFIG
+
 LT_INIT
 
-AC_HAVE_LIBRARY(ctap,,
-	AC_MSG_ERROR(Missing ctap testing library - see http://github.com/filefrog/ctap))
+PKG_CHECK_MODULES([ctap], [ctap], [HAVE_CTAP=1])
 
 AC_CHECK_LIB(zmq,
 	zmq_msg_send,,
@@ -35,6 +36,14 @@ AC_C_INLINE
 
 AX_TEST_COVERAGE
 
+# set pkgconfigdir, allow override
+AC_ARG_WITH([pkgconfigdir],
+    AS_HELP_STRING([--with-pkgconfigdir=PATH],
+        [Path to the pkgconfig directory [[LIBDIR/pkgconfig]]]),
+    [pkgconfigdir="$withval"],
+    [pkgconfigdir='${libdir}/pkgconfig'])
+AC_SUBST([pkgconfigdir])
+
 AC_CONFIG_HEADER([config.h])
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile src/libvigor.pc])
 AC_OUTPUT

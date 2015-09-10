@@ -1,6 +1,8 @@
 .libs
 .deps
 *.in
+!src/libvigor.pc.in
+src/libvigor.pc
 stamp-h1
 .dirstamp
 autom4te.cache

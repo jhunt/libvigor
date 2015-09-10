@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libvigor
+Description: The Missing Bits of C
+Version: @VERSION@
+Requires: libzmq
+Libs: -L${libdir} -lvigor
+Cflags: -I${includedir}

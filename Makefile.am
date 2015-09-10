@@ -12,6 +12,8 @@ AM_CFLAGS += @GCOV_CFLAGS@
 
 ############################################################
 
+pkgconfig_DATA = src/libvigor.pc
+
 core_src :=
 core_src += include/vigor.h
 core_src += src/impl.h
