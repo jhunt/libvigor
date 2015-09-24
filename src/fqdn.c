@@ -66,6 +66,7 @@ char* fqdn(void)
 
 	char *ret = NULL;
 	for (p = info; p != NULL; p = p->ai_next) {
+		if (!p->ai_canonname) continue;
 		if (strcmp(p->ai_canonname, nodename) == 0) continue;
 		ret = strdup(p->ai_canonname);
 		break;
