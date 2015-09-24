@@ -49,6 +49,7 @@ include_HEADERS = include/vigor.h
 
 CTAP_TESTS =
 
+if HAVE_CTAP
 CTAP_TESTS += t/basex
 t_basex_SOURCES = t/basex.c t/test.h
 t_basex_LDFLAGS = libvigor.la $(ctap_LIBS)
@@ -128,6 +129,7 @@ t_strings_LDFLAGS = libvigor.la $(ctap_LIBS)
 CTAP_TESTS += t/time
 t_time_SOURCES = t/time.c t/test.h
 t_time_LDFLAGS = libvigor.la $(ctap_LIBS)
+endif
 
 TESTS          = $(CTAP_TESTS) t/memcheck
 BUILT_TESTS    = $(CTAP_TESTS)

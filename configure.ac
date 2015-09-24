@@ -18,7 +18,11 @@ PKG_PROG_PKG_CONFIG
 
 LT_INIT
 
-PKG_CHECK_MODULES([ctap], [ctap], [HAVE_CTAP=1])
+AC_ARG_WITH([ctap], AS_HELP_STRING([--with-ctap], [Enable libctap-based tests]))
+AS_IF([test "x$with_ctap" != "xno"], [
+	PKG_CHECK_MODULES([ctap], [ctap], [HAVE_CTAP=1])
+])
+AM_CONDITIONAL(HAVE_CTAP, test x$HAVE_CTAP = x1)
 
 AC_CHECK_LIB(zmq,
 	zmq_msg_send,,
