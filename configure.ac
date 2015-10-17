@@ -18,8 +18,6 @@ PKG_PROG_PKG_CONFIG
 
 LT_INIT
 
-AM_CONDITIONAL(HAVE_CTAP, test x$HAVE_CTAP = x1)
-
 AC_CHECK_LIB(zmq,
 	zmq_msg_send,,
 	AC_MSG_ERROR(Missing a recent vintage 0MQ library))
