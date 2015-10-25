@@ -13,9 +13,8 @@ BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
 BuildRequires:  libtool
-BuildRequires:  libctap
-BuildRequires:  libctap-devel
-BuildRequires:  zeromq-devel
+BuildRequires:  ctap
+BuildRequires:  libzmq-devel
 BuildRequires:  libsodium-devel
 
 %description
@@ -67,6 +66,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/vigor.h
 %{_libdir}/libvigor.a
 %{_libdir}/libvigor.la
+%{_libdir}/pkgconfig/libvigor.pc
 
 
 %changelog
