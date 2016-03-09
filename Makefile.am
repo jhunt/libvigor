@@ -2,6 +2,7 @@
 # Makefile.am - libvigor Automake File
 #
 
+SOVERSION := 2:0:1
 AUTOMAKE_OPTIONS = foreign subdir-objects
 ACLOCAL_AMFLAGS  = -I build
 
@@ -43,7 +44,7 @@ core_src += src/time.c
 
 lib_LTLIBRARIES = libvigor.la
 libvigor_la_SOURCES = $(core_src)
-libvigor_la_LDFLAGS = -version-info 1:0:0
+libvigor_la_LDFLAGS = -version-info $(SOVERSION)
 
 include_HEADERS = include/vigor.h
 
