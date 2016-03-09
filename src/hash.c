@@ -133,6 +133,31 @@ void* hash_set(hash_t *h, const char *k, void *v)
 	return existing;
 }
 
+/**
+  Unset the key $k in hash $h.
+
+  If the key isn't set, NULL will be returned.
+  If it is, the value will be removed, and returned
+  (so that the caller can free it).
+ */
+void* hash_unset(hash_t *h, const char *k) {
+	if (!h || !k) return NULL;
+
+	struct hash_bkt *b = &h->entries[s_hash64(k)];
+	ssize_t i = s_hash_index(b, k);
+	if (i < 0) {
+		return NULL;
+	}
+
+	void *existing = b->values[i];
+	ssize_t j;
+	for (j = i + 1; j < b->len; j) {
+		b->values[i++] = b->values[j++];
+	}
+	b->len--;
+	return existing;
+}
+
 /* internal use; external visibility for macro loops */
 void* hash_next(hash_t *h, char **k, void **v)
 {
