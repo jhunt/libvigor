@@ -1,5 +1,5 @@
 /*
-  Copyright 2014 James Hunt <james@jameshunt.us>
+  Copyright 2016 James Hunt <james@jameshunt.us>
 
   This file is part of libvigor.
 
