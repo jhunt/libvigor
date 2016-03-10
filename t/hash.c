@@ -86,18 +86,23 @@ TESTS {
 
 	subtest {
 		hash_t *h;
+		char *foo = strdup("foo");
 		char *bar = strdup("bar");
 
 		isnt_null(h = vmalloc(sizeof(hash_t)), "hash_new -> pointer");
 
-		ok(hash_set(h, "foo", bar) == bar, "hash_set(foo = bar)");
-		ok(hash_get(h, "foo") == bar, "hash_get(foo) == bar");
-		ok(hash_unset(h, "foo") == bar, "hash_unset(foo) == bar");
+		ok(hash_set(h, "foo", foo) == foo, "hash_set(foo = foo)");
+		ok(hash_get(h, "foo") == foo, "hash_get(foo) == foo");
+		ok(hash_set(h, "bar", bar) == bar, "hash_set(bar = bar)");
+		ok(hash_get(h, "bar") == bar, "hash_get(foo) == bar");
+
+		ok(hash_unset(h, "foo") == foo, "hash_unset(foo) == foo");
 		ok(hash_get(h, "foo") == NULL, "hash_get(foo) == NULL after unset call");
+		ok(hash_get(h, "bar") == bar, "hash_get(foo) == bar after unset call");
 
 		hash_done(h, 1);
 		free(h);
-		free(bar);
+		free(foo);
 	}
 
 	subtest {
