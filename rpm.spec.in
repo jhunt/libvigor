@@ -1,20 +1,18 @@
 Name:           libvigor
-Version:        1.2.8
+Version:        @VERSION@
 Release:        1%{?dist}
 Summary:        Missing Bits of C
 
 Group:          System Environment/Libraries
 License:        GPLv3+
-URL:            https://github.com/filefrog/vigor
+URL:            https://github.com/jhunt/libvigor
 Source0:        %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  autoconf
-BuildRequires:  automake
 BuildRequires:  gcc
 BuildRequires:  libtool
 BuildRequires:  ctap
-BuildRequires:  libzmq-devel
+BuildRequires:  zeromq-devel
 BuildRequires:  libsodium-devel
 
 %description
@@ -57,15 +55,15 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%{_libdir}/libvigor.so
-%{_libdir}/libvigor.so.1
-%{_libdir}/libvigor.so.1.0.0
+%{_libdir}/libvigor.so.@SOFULL@
+%{_libdir}/libvigor.so.@SOLATEST@
 
 %files devel
 %defattr(-,root,root,-)
 %{_includedir}/vigor.h
 %{_libdir}/libvigor.a
 %{_libdir}/libvigor.la
+%{_libdir}/libvigor.so
 %{_libdir}/pkgconfig/libvigor.pc
 
 

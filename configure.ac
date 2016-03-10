@@ -1,5 +1,6 @@
 AC_INIT([libvigor], [1.2.9], [bugs@niftylogic.com])
 AC_PREREQ(2.63)
+AX_ABI_VERSION([2], [0], [1])
 AC_CONFIG_SRCDIR([include/vigor.h])
 AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build])
@@ -43,5 +44,5 @@ AC_ARG_WITH([pkgconfigdir],
 AC_SUBST([pkgconfigdir])
 
 AC_CONFIG_HEADER([config.h])
-AC_CONFIG_FILES([Makefile src/libvigor.pc])
+AC_CONFIG_FILES([Makefile src/libvigor.pc rpm.spec])
 AC_OUTPUT
