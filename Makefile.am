@@ -2,7 +2,6 @@
 # Makefile.am - libvigor Automake File
 #
 
-SOVERSION := 2:0:1
 AUTOMAKE_OPTIONS = foreign subdir-objects
 ACLOCAL_AMFLAGS  = -I build
 

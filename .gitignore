@@ -3,6 +3,8 @@
 *.in
 !src/libvigor.pc.in
 src/libvigor.pc
+!rpm.spec.in
+rpm.spec
 stamp-h1
 .dirstamp
 autom4te.cache
@@ -11,6 +13,7 @@ libtool
 build/*
 !build/coverage.m4
 !build/as-compiler-flag.m4
+!build/abi.m4
 coverage
 configure
 config.status
