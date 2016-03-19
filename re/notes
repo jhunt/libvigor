@@ -1,0 +1,4 @@
+This is a re-release of 1.2.9, to bundle a configure script for
+build environments that don't want to muck about with autotools.
+
+It is identical in every other way to 1.2.9.
