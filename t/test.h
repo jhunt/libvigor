@@ -37,7 +37,7 @@
 #include <netdb.h>
 
 #ifndef TEST_DATA
-#define TEST_DATA "t/data"
+#define TEST_DATA "t/tmp/data"
 #endif
 
 #ifndef TEST_TMP
