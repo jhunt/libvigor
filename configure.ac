@@ -1,5 +1,5 @@
-AC_INIT([libvigor], [1.2.10], [bugs@niftylogic.com])
 AC_PREREQ(2.63)
+AC_INIT([libvigor], [m4_esyscmd([./version.sh])], [bugs@niftylogic.com])
 AX_ABI_VERSION([2], [0], [1])
 AC_CONFIG_SRCDIR([include/vigor.h])
 AC_CONFIG_AUX_DIR([build])
