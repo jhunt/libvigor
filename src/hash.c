@@ -151,7 +151,7 @@ void* hash_unset(hash_t *h, const char *k) {
 
 	void *existing = b->values[i];
 	ssize_t j;
-	for (j = i + 1; j < b->len; j) {
+	for (j = i + 1; j < b->len;) {
 		b->values[i++] = b->values[j++];
 	}
 	b->len--;
