@@ -28,6 +28,7 @@ TESTS {
 
 		isnt_null(h = vmalloc(sizeof(hash_t)), "hash_new -> pointer");
 
+		/* note: "path" and "group" both hash to 62 */
 		is_null(hash_get(h, "path"), "can't get 'path' prior to set");
 		is_null(hash_get(h, "name"), "can't get 'name' prior to set");
 
@@ -91,14 +92,15 @@ TESTS {
 
 		isnt_null(h = vmalloc(sizeof(hash_t)), "hash_new -> pointer");
 
-		ok(hash_set(h, "foo", foo) == foo, "hash_set(foo = foo)");
-		ok(hash_get(h, "foo") == foo, "hash_get(foo) == foo");
-		ok(hash_set(h, "bar", bar) == bar, "hash_set(bar = bar)");
-		ok(hash_get(h, "bar") == bar, "hash_get(foo) == bar");
+		/* note: "path" and "group" both hash to 62; this also tests collision. */
+		ok(hash_set(h, "path", foo) == foo, "hash_set(path = foo)");
+		ok(hash_get(h, "path") == foo, "hash_get(path) == foo");
+		ok(hash_set(h, "group", bar) == bar, "hash_set(group = bar)");
+		ok(hash_get(h, "group") == bar, "hash_get(group) == bar");
 
-		ok(hash_unset(h, "foo") == foo, "hash_unset(foo) == foo");
-		ok(hash_get(h, "foo") == NULL, "hash_get(foo) == NULL after unset call");
-		ok(hash_get(h, "bar") == bar, "hash_get(foo) == bar after unset call");
+		ok(hash_unset(h, "path") == foo, "hash_unset(path) == foo");
+		ok(hash_get(h, "path") == NULL, "hash_get(path) == NULL after unset call");
+		ok(hash_get(h, "group") == bar, "hash_get(group) == bar after unset call");
 
 		hash_done(h, 1);
 		free(h);
