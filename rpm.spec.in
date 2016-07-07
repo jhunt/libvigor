@@ -68,6 +68,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Jul 07 2016  Dan Molik <dan@d3fy.net>        1.2.11-1
+- Add hash length macro
+
 * Sat Oct 24 2015 James Hunt <james@niftylogiccom> 1.2.8-1
 - Upstream release
 

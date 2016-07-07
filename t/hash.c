@@ -121,6 +121,24 @@ TESTS {
 	}
 
 	subtest {
+		hash_t *h;
+		char *foo = strdup("foo");
+		char *bar = strdup("bar");
+
+		isnt_null(h = vmalloc(sizeof(hash_t)), "hash_new -> pointer");
+		hash_set(h, "foo", foo);
+		hash_set(h, "bar", bar);
+		ok(hash_len(h) == 2, "hash length is 2 after 2 elements");
+		hash_unset(h, "foo");
+		ok(hash_len(h) == 1, "hash length is decrimetted after unset");
+
+		hash_done(h, 0);
+		free(h);
+		free(foo);
+		free(bar);
+	}
+
+	subtest {
 		hash_t *h = vmalloc(sizeof(hash_t));
 		char *key, *value;
 

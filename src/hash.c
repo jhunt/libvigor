@@ -124,7 +124,8 @@ void* hash_set(hash_t *h, const char *k, void *v)
 	ssize_t i = s_hash_index(b, k);
 
 	if (i < 0) {
-		s_hash_insert(b, k, v);
+		if(s_hash_insert(b, k, v) == 0)
+			h->len++;
 		return v;
 	}
 
@@ -155,6 +156,7 @@ void* hash_unset(hash_t *h, const char *k) {
 		b->keys[i]   = b->keys[j];
 		b->values[i] = b->values[j];
 	}
+	h->len--;
 	b->len--;
 	return existing;
 }
