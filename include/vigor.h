@@ -156,6 +156,7 @@ struct hash {
 	struct hash_bkt entries[64];
 	ssize_t         bucket;
 	ssize_t         offset;
+	size_t          len;
 };
 void hash_done(hash_t *h, uint8_t all);
 void* hash_get(const hash_t *h, const char *k);
@@ -164,6 +165,8 @@ void* hash_unset(hash_t *h, const char *k);
 void* hash_next(hash_t *h, char **k, void **v);
 void hash_merge(hash_t *a, hash_t *b);
 
+#define hash_len(h) \
+	(h->len)
 #define for_each_key_value(h,k,v) \
 	for ((h)->offset = (h)->bucket = 0; \
 	     hash_next((h), &(k), (void**)&(v)); )
