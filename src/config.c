@@ -156,7 +156,8 @@ int config_read(config_t *cfg, FILE *io)
 		char *a, *b, *c, *d;
 
 		/* strip comments */
-		for (a = line; *a && *a != '#'; a++); *a = '\0';
+		for (a = line; *a && *a != '#'; a++);
+		*a = '\0';
 		/* start of key token */
 		for (a = line; *a &&  isspace(*a); a++);
 		/* end of key token */
@@ -164,7 +165,8 @@ int config_read(config_t *cfg, FILE *io)
 		/* start of value */
 		for (c = b;    *c &&  isspace(*c); c++);
 		/* end of value */
-		for (d = c; *d; d++); for (; d > c && (!*d || isspace(*d)); d--);
+		for (d = c; *d; d++);
+		for (; d > c && (!*d || isspace(*d)); d--);
 		if (*d) d++;
 		*b = *d = '\0';
 
