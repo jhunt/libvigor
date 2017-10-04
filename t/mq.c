@@ -283,9 +283,9 @@ TESTS {
 		char *badcert_x[32],
 		     *badcert_y[32],
 		     *badcert_z[32];
-		memset(badcert_x, 'x', 32);
-		memset(badcert_y, 'y', 32);
-		memset(badcert_z, 'z', 32);
+		memset(badcert_x, 'x', sizeof(badcert_x));
+		memset(badcert_y, 'y', sizeof(badcert_y));
+		memset(badcert_z, 'z', sizeof(badcert_z));
 
 		void *z = zmq_ctx_new(); assert(z);
 		void *zap = zap_startup(z, NULL); assert(zap);
