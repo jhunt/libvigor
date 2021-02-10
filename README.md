@@ -10,11 +10,14 @@ Getting Started
 ---------------
 
 To compile libvigor, use the standard incantation:
-    $ ./bootstrap
-    $ ./configure
-    $ make
-    $ make check           # optional, but recommended
-    $ sudo make install
+
+```
+./bootstrap
+./configure
+make
+make check           # optional, but recommended
+sudo make install
+```
 
 This will compile and install libvigor into the standard system places. libvigor
 requires (https://download.libsodium.org/doc/)[libsodium], (http://zeromq.org/area:download)[libzmq3],
@@ -135,3 +138,6 @@ Miscellaneous
 
 - fqdn
 - randomness
+
+
+[ctap]: https://github.com/jhunt/ctap
